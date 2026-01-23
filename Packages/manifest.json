@@ -3,6 +3,7 @@
     "com.htc.upm.vive.openxr": "https://github.com/ViveSoftware/VIVE-OpenXR.git?path=com.htc.upm.vive.openxr",
     "com.unity.collab-proxy": "2.11.2",
     "com.unity.feature.development": "1.0.1",
+    "com.unity.render-pipelines.universal": "14.0.11",
     "com.unity.shadergraph": "14.0.11",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.6",
