@@ -20,6 +20,12 @@ public class EnterRoom : MonoBehaviour
     public Collider supermarketCollider; 
     public Collider streetCollider; 
     public Collider classroomCollider;
+
+    public AudioSource supermarketBackgroundSound;
+    public AudioSource streetBackgroundSound;
+    public AudioSource classroomBackgroundSound;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -54,6 +60,9 @@ public class EnterRoom : MonoBehaviour
 
                 supermarketFrame.SetActive(false);
                 classroomFrame.SetActive(false);
+
+                if(streetBackgroundSound!=null)
+                    streetBackgroundSound.enabled = true;
 
             }
             if (gameObject == classroomCollider.gameObject)
