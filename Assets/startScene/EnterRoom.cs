@@ -58,6 +58,7 @@ public class EnterRoom : MonoBehaviour
             }
             if (gameObject == classroomCollider.gameObject)
             {
+                Debug.Log("entered classroom");
                 supermarket.SetActive(false);
                 street.SetActive(false);
                 classroom.SetActive(true);
