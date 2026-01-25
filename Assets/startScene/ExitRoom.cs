@@ -18,6 +18,9 @@ public class ExitRoom : MonoBehaviour
 
     // Start is called before the first frame update
  
+    public AudioSource supermarketBackgroundSound;
+    public AudioSource streetBackgroundSound;
+    public AudioSource classroomBackgroundSound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -34,6 +37,10 @@ public class ExitRoom : MonoBehaviour
             supermarketFrame.SetActive(true);
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
+            
+            if(streetBackgroundSound!=null)
+                streetBackgroundSound.enabled = false;
+                
 
         }
     }
