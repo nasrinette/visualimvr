@@ -229,6 +229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aButtonAction: {fileID: -3599823989380923159, guid: 0be0028c24f2a4c14a96b6aa39055933, type: 3}
   rayInteractor: {fileID: 2083409961}
+  dialogueClips:
+  - {fileID: 8300000, guid: 592813882bdec0a4ba2edf23bd08ed46, type: 3}
 --- !u!114 &62283505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,6 +354,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.57, y: 2.16, z: 0.98}
   m_Center: {x: 0, y: 1.09, z: 0}
+--- !u!114 &62283507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62283501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4ced36cdcab11c46b339e66d0e59579, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &106796528
 GameObject:
   m_ObjectHideFlags: 0
@@ -1381,6 +1395,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ed783c6987ac40d45ba351f413f4a41b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 62283504}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ed783c6987ac40d45ba351f413f4a41b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 62283507}
   m_SourcePrefab: {fileID: 100100000, guid: ed783c6987ac40d45ba351f413f4a41b, type: 3}
 --- !u!1 &336426667
 GameObject:
@@ -4446,6 +4463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorblindType: 5
+  dialogueClip: {fileID: 8300000, guid: fde95438c44d10d488ddebed7740ff58, type: 3}
   hideOnGrab: 1
 --- !u!65 &1100349578
 BoxCollider:
@@ -5907,6 +5925,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorblindType: 3
+  dialogueClip: {fileID: 8300000, guid: 0688ac6afa28e374a88f7b97557703f5, type: 3}
   hideOnGrab: 1
 --- !u!65 &1367513447
 BoxCollider:
@@ -6247,6 +6266,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorblindType: 1
+  dialogueClip: {fileID: 8300000, guid: 10e4f66ac2169594aba397da8ce391ea, type: 3}
   hideOnGrab: 1
 --- !u!65 &1458473128
 BoxCollider:

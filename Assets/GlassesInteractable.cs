@@ -8,11 +8,16 @@ public class GlassesInteractable : MonoBehaviour
     [Tooltip("Which colorblind mode to activate when these glasses are picked up")]
     public ColorblindTypes colorblindType = ColorblindTypes.Protanopia;
 
+    [Header("Dialogue")]
+    [Tooltip("Audio clip to play when these glasses are grabbed")]
+    public AudioClip dialogueClip;
+
     [Header("Behavior")]
     [Tooltip("Should the glasses disappear when grabbed?")]
     public bool hideOnGrab = true;
 
     private XRGrabInteractable grabInteractable;
+    private GuideCharacter guideCharacter;
 
     void Awake()
     {
@@ -24,6 +29,9 @@ public class GlassesInteractable : MonoBehaviour
             Debug.LogError($"No XRGrabInteractable found on {gameObject.name}. Please add one.");
             return;
         }
+
+        // Find the guide character in the scene
+        guideCharacter = FindObjectOfType<GuideCharacter>();
     }
 
     void OnEnable()
@@ -56,6 +64,12 @@ public class GlassesInteractable : MonoBehaviour
         else
         {
             Debug.LogWarning("Colorblindness system not found in scene!");
+        }
+
+        // Tell the guide character to play dialogue
+        if (guideCharacter != null && dialogueClip != null)
+        {
+            guideCharacter.PlayDialogue(dialogueClip);
         }
 
         // Hide/destroy the glasses
