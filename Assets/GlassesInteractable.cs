@@ -17,11 +17,11 @@ public class GlassesInteractable : MonoBehaviour
     public bool hideOnGrab = true;
 
     private XRGrabInteractable grabInteractable;
-    private GuideCharacter guideCharacter;
+    private CharacterInteractOnPoint guideCharacter;
+    private MissionManager missionManager;
 
     void Awake()
     {
-        // Get or add the XR Grab Interactable component
         grabInteractable = GetComponent<XRGrabInteractable>();
         
         if (grabInteractable == null)
@@ -30,15 +30,19 @@ public class GlassesInteractable : MonoBehaviour
             return;
         }
 
-        // Find the guide character in the scene
-        guideCharacter = FindObjectOfType<GuideCharacter>();
+        guideCharacter = FindObjectOfType<CharacterInteractOnPoint>();
+        missionManager = FindObjectOfType<MissionManager>();
+        
+        if (missionManager == null)
+        {
+            Debug.LogError("MissionManager not found in scene!");
+        }
     }
 
     void OnEnable()
     {
         if (grabInteractable != null)
         {
-            // Subscribe to the select entered event (when grab begins)
             grabInteractable.selectEntered.AddListener(OnGlassesGrabbed);
         }
     }
@@ -56,9 +60,7 @@ public class GlassesInteractable : MonoBehaviour
         // Apply the colorblind filter
         if (Colorblindness.Instance != null)
         {
-            // Cast the enum to int to pass the correct filter index
             Colorblindness.Instance.Change((int)colorblindType);
-            
             Debug.Log($"Applied {colorblindType} filter from {gameObject.name}");
         }
         else
@@ -72,11 +74,21 @@ public class GlassesInteractable : MonoBehaviour
             guideCharacter.PlayDialogue(dialogueClip);
         }
 
-        // Hide/destroy the glasses
+        // Tell mission manager which glasses were picked up
+        if (missionManager != null)
+        {
+            Debug.Log($"Notifying MissionManager: {colorblindType} glasses picked up");
+            missionManager.OnGlassesPickedUp(colorblindType);
+        }
+        else
+        {
+            Debug.LogError("Cannot notify MissionManager - it's null!");
+        }
+
+        // Hide the glasses
         if (hideOnGrab)
         {
             gameObject.SetActive(false);
-            // Or use: Destroy(gameObject); if you don't want them to reappear
         }
     }
 }
