@@ -13,6 +13,7 @@ public class LightSwitch : MonoBehaviour
 
     [Header("State")]
     [SerializeField] private bool lightsOn = false;
+    public bool IsOn => lightsOn;
 
     private XRSimpleInteractable interactable;
 

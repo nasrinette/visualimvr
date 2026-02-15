@@ -281,6 +281,19 @@ public class CurtainInteraction : MonoBehaviour
         return done;
     }
 
+    /// <summary>
+    /// Returns 0 = fully open, 1 = fully closed.
+    /// </summary>
+    public float GetClosedAmount()
+    {
+        float leftT = 0f, rightT = 0f;
+        if (leftCurtain != null)
+            leftT = Mathf.InverseLerp(leftOpenX, leftClosedX, leftCurtain.localPosition.x);
+        if (rightCurtain != null)
+            rightT = Mathf.InverseLerp(rightOpenX, rightClosedX, rightCurtain.localPosition.x);
+        return (leftT + rightT) * 0.5f;
+    }
+
     public void DebugSetOpen() => SetTargets(leftOpenX, rightOpenX);
     public void DebugSetClosed() => SetTargets(leftClosedX, rightClosedX);
     public void DebugSetHalfOpen() => SetTargets(leftHalfOpenX, rightHalfOpenX);
