@@ -104,11 +104,6 @@ public class CurtainInteraction : MonoBehaviour
         leftInteractor = args.interactorObject;
         leftGrabStartWorld = GetInteractorPosition(leftInteractor);
         leftCurtainGrabStartX = leftTargetX;
-        if (rightInteractor != null)
-        {
-            rightGrabStartWorld = GetInteractorPosition(rightInteractor);
-            rightCurtainGrabStartX = rightTargetX;
-        }
         Debug.Log("Left curtain hook grabbed");
     }
 
@@ -123,11 +118,6 @@ public class CurtainInteraction : MonoBehaviour
         rightInteractor = args.interactorObject;
         rightGrabStartWorld = GetInteractorPosition(rightInteractor);
         rightCurtainGrabStartX = rightTargetX;
-        if (leftInteractor != null)
-        {
-            leftGrabStartWorld = GetInteractorPosition(leftInteractor);
-            leftCurtainGrabStartX = leftTargetX;
-        }
         Debug.Log("Right curtain hook grabbed");
     }
 
@@ -139,18 +129,21 @@ public class CurtainInteraction : MonoBehaviour
 
     void Update()
     {
-        // Update targets from hand movement when both hooks are grabbed
-        if (leftInteractor != null && rightInteractor != null)
+        Vector3 localXWorld = transform.TransformDirection(Vector3.right);
+
+        // Update left curtain target from hand movement
+        if (leftInteractor != null)
         {
-            Vector3 localXWorld = transform.TransformDirection(Vector3.right);
-
             Vector3 leftCurrentWorld = GetInteractorPosition(leftInteractor);
-            Vector3 rightCurrentWorld = GetInteractorPosition(rightInteractor);
-
             float leftDelta = Vector3.Dot(leftCurrentWorld - leftGrabStartWorld, localXWorld) * sensitivity;
-            float rightDelta = Vector3.Dot(rightCurrentWorld - rightGrabStartWorld, localXWorld) * sensitivity;
-
             leftTargetX = Mathf.Clamp(leftCurtainGrabStartX + leftDelta, leftOpenX, leftClosedX);
+        }
+
+        // Update right curtain target from hand movement
+        if (rightInteractor != null)
+        {
+            Vector3 rightCurrentWorld = GetInteractorPosition(rightInteractor);
+            float rightDelta = Vector3.Dot(rightCurrentWorld - rightGrabStartWorld, localXWorld) * sensitivity;
             rightTargetX = Mathf.Clamp(rightCurtainGrabStartX + rightDelta, rightClosedX, rightOpenX);
         }
 
