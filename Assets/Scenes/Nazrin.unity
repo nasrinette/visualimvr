@@ -1028,6 +1028,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 113681517}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!134 &120140622
+PhysicMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ' (Instance) (Instance)'
+  dynamicFriction: 0.6
+  staticFriction: 0.6
+  bounciness: 0
+  frictionCombine: 0
+  bounceCombine: 0
 --- !u!1 &134764774
 GameObject:
   m_ObjectHideFlags: 0
@@ -3207,7 +3219,7 @@ Transform:
   m_GameObject: {fileID: 479225824}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.13, y: 0.554, z: 3.04}
+  m_LocalPosition: {x: -1.648, y: 0.554, z: 3.0402}
   m_LocalScale: {x: 0.15, y: 0.25, z: 0.05}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3230,14 +3242,8 @@ MonoBehaviour:
   - {fileID: 428847954}
   - {fileID: 720084508}
   - {fileID: 1951123982}
-  lightPanels:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  panelOnMaterial: {fileID: 2100000, guid: d1af9704102b741de9468c78ac5b9f87, type: 2}
-  panelOffMaterial: {fileID: 2100000, guid: 609912e07f9a54928b6350e7f6acff50, type: 2}
-  lightsOn: 1
+  switchRenderer: {fileID: 479225828}
+  lightsOn: 0
 --- !u!114 &479225827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3389,7 +3395,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 479225824}
-  m_Material: {fileID: 1934250206}
+  m_Material: {fileID: 120140622}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -19332,18 +19338,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!134 &1934250206
-PhysicMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: ' (Instance)'
-  dynamicFriction: 0.6
-  staticFriction: 0.6
-  bounciness: 0
-  frictionCombine: 0
-  bounceCombine: 0
 --- !u!1 &1936063055
 GameObject:
   m_ObjectHideFlags: 0
