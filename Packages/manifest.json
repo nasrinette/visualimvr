@@ -2,7 +2,7 @@
   "dependencies": {
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
     "com.htc.upm.vive.openxr": "https://github.com/ViveSoftware/VIVE-OpenXR.git?path=com.htc.upm.vive.openxr",
-    "com.sohne.colorblindness": "https://github.com/SOHNE/Colorblindness.git#upm",
+    "com.sohne.colorblindness": "file:com.sohne.colorblindness",
     "com.unity.burst": "1.8.15",
     "com.unity.cinemachine": "2.10.5",
     "com.unity.cloud.gltfast": "6.14.1",

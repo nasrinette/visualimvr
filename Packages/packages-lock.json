@@ -22,13 +22,12 @@
       "hash": "25a5fd212420688952ead9deba735357656278ec"
     },
     "com.sohne.colorblindness": {
-      "version": "https://github.com/SOHNE/Colorblindness.git#upm",
+      "version": "file:com.sohne.colorblindness",
       "depth": 0,
-      "source": "git",
+      "source": "embedded",
       "dependencies": {
         "com.unity.render-pipelines.core": "4.10.0-preview"
-      },
-      "hash": "5bedd7c104dc8ad83ed2a06c5f98c829173bea30"
+      }
     },
     "com.unity.burst": {
       "version": "1.8.24",
