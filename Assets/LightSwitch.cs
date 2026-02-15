@@ -7,18 +7,17 @@ public class LightSwitch : MonoBehaviour
     [Tooltip("Drag all the lights this switch should toggle")]
     public Light[] lights;
 
-    [Header("Light Panel Visuals")]
-    [Tooltip("Renderers for the ceiling light panels (will swap materials on toggle)")]
-    public Renderer[] lightPanels;
-    [Tooltip("Material for panels when lights are ON (emissive)")]
-    public Material panelOnMaterial;
-    [Tooltip("Material for panels when lights are OFF (dark)")]
-    public Material panelOffMaterial;
+    [Header("Switch Visual")]
+    [Tooltip("Renderer for the switch itself (changes color: green=ON, red=OFF)")]
+    public Renderer switchRenderer;
 
     [Header("State")]
-    [SerializeField] private bool lightsOn = true;
+    [SerializeField] private bool lightsOn = false;
 
     private XRSimpleInteractable interactable;
+
+    private static readonly Color switchOnColor = new Color(0.1f, 0.8f, 0.1f);
+    private static readonly Color switchOffColor = new Color(0.8f, 0.1f, 0.1f);
 
     void Awake()
     {
@@ -28,17 +27,13 @@ public class LightSwitch : MonoBehaviour
     void OnEnable()
     {
         if (interactable != null)
-        {
             interactable.selectEntered.AddListener(OnSwitchPressed);
-        }
     }
 
     void OnDisable()
     {
         if (interactable != null)
-        {
             interactable.selectEntered.RemoveListener(OnSwitchPressed);
-        }
     }
 
     void Start()
@@ -61,14 +56,7 @@ public class LightSwitch : MonoBehaviour
                 light.enabled = lightsOn;
         }
 
-        Material panelMat = lightsOn ? panelOnMaterial : panelOffMaterial;
-        if (panelMat != null)
-        {
-            foreach (var panel in lightPanels)
-            {
-                if (panel != null)
-                    panel.material = panelMat;
-            }
-        }
+        if (switchRenderer != null)
+            switchRenderer.material.color = lightsOn ? switchOnColor : switchOffColor;
     }
 }
