@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using TMPro;
 
 /// <summary>
 /// Monitors all curtains and light switches in the scene.
@@ -25,12 +26,17 @@ public class RoomDarknessController : MonoBehaviour
     [Tooltip("Post-exposure when fully dark")]
     public float darkExposure = -1.5f;
 
+    [Header("Whiteboard Text")]
+    [Tooltip("TMP texts on the whiteboard that should dim with the room")]
+    public TextMeshProUGUI[] whiteboardTexts;
+
     [Header("Transition")]
     [Tooltip("How fast the room darkness changes")]
     public float transitionSpeed = 2f;
 
     private float currentDarkness;
     private ColorAdjustments colorAdjustments;
+    private Color[] originalTextColors;
 
     void Start()
     {
@@ -39,6 +45,25 @@ public class RoomDarknessController : MonoBehaviour
 
         if (lightSwitches == null || lightSwitches.Length == 0)
             lightSwitches = FindObjectsOfType<LightSwitch>();
+
+        // Auto-find whiteboard texts if not assigned
+        if (whiteboardTexts == null || whiteboardTexts.Length == 0)
+        {
+            var canvas = GameObject.Find("classroom/Classroom/WhiteBoard/Canvas");
+            if (canvas != null)
+                whiteboardTexts = canvas.GetComponentsInChildren<TextMeshProUGUI>();
+        }
+
+        // Store original text colors
+        if (whiteboardTexts != null)
+        {
+            originalTextColors = new Color[whiteboardTexts.Length];
+            for (int i = 0; i < whiteboardTexts.Length; i++)
+            {
+                if (whiteboardTexts[i] != null)
+                    originalTextColors[i] = whiteboardTexts[i].color;
+            }
+        }
 
         // Find ColorAdjustments from the global volume
         var volumes = FindObjectsOfType<Volume>();
@@ -63,6 +88,17 @@ public class RoomDarknessController : MonoBehaviour
         // Adjust post-exposure
         if (colorAdjustments != null)
             colorAdjustments.postExposure.Override(Mathf.Lerp(brightExposure, darkExposure, currentDarkness));
+
+        // Dim whiteboard text
+        if (whiteboardTexts != null && originalTextColors != null)
+        {
+            float brightness = 1f - currentDarkness;
+            for (int i = 0; i < whiteboardTexts.Length; i++)
+            {
+                if (whiteboardTexts[i] != null)
+                    whiteboardTexts[i].color = originalTextColors[i] * brightness;
+            }
+        }
     }
 
     /// <summary>
