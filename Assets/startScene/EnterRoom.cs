@@ -26,7 +26,9 @@ public class EnterRoom : MonoBehaviour
     public Collider streetBlocker;
     [Tooltip("Solid collider that blocks classroom door when inactive")]
     public Collider classroomBlocker;
-
+    [Header("UI")]
+    public ScenarioUIManager uiManager;
+    
     private MissionManager missionManager;
     public AudioSource blockedEntrySound;
 
@@ -78,7 +80,7 @@ public class EnterRoom : MonoBehaviour
     {
         if (other.CompareTag("MainCamera"))
         {
-            // SUPERMARKET: Can only enter if glasses have been grabbed
+            // SUPERMARKET
             if (gameObject == supermarketCollider.gameObject)
             {
                 if (missionManager != null && !missionManager.HasGrabbedGlasses())
@@ -88,13 +90,20 @@ public class EnterRoom : MonoBehaviour
                         blockedEntrySound.Play();
                     return;
                 }
-
+                
                 supermarket.SetActive(true);
                 street.SetActive(false);
                 classroom.SetActive(false);
                 baseRoom.SetActive(false);
                 streetFrame.SetActive(false);
                 classroomFrame.SetActive(false);
+                
+                // NEW: Update UI to show the specific mission item
+                if (uiManager != null)
+                {
+                    uiManager.ShowScenarioInfo("Supermarket");
+                    // This will update to show "Mission: Bring a ripe tomato" etc.
+                }
             }
 
             // STREET: Can only enter if supermarket tasks are NOT complete yet
@@ -118,6 +127,12 @@ public class EnterRoom : MonoBehaviour
                 classroomFrame.SetActive(false);
                 if(streetBackgroundSound != null)
                     streetBackgroundSound.enabled = true;
+
+                // NEW: Show scenario UI
+                if (uiManager != null)
+                {
+                    uiManager.ShowScenarioInfo("Street");
+                }
             }
 
             // CLASSROOM: Can only enter if supermarket tasks are NOT complete yet
@@ -139,6 +154,12 @@ public class EnterRoom : MonoBehaviour
                 baseRoom.SetActive(false);
                 supermarketFrame.SetActive(false);
                 streetFrame.SetActive(false);
+
+                // NEW: Show scenario UI
+                if (uiManager != null)
+                {
+                    uiManager.ShowScenarioInfo("Classroom");
+                }
             }
         }
     }

@@ -36,6 +36,8 @@ public class MissionManager : MonoBehaviour
     private SupermarketItem.ItemType currentObjective;
     private bool hasMissionActive = false; // Track if a mission is active
 
+    [SerializeField] private ScenarioUIManager uiManager;
+
     void Start()
     {
         StartIntroduction();
@@ -82,6 +84,12 @@ public class MissionManager : MonoBehaviour
         currentObjective = SupermarketItem.ItemType.Tomato;
         hasMissionActive = true;
         Debug.Log("Mission 1: Bring me a ripe tomato!");
+        
+        // NEW: Show "Go to supermarket" instruction
+        if (uiManager != null)
+        {
+            uiManager.ShowGoToSupermarketInstruction();
+        }
     }
 
     void StartMission2()
@@ -90,6 +98,12 @@ public class MissionManager : MonoBehaviour
         currentObjective = SupermarketItem.ItemType.BellPepper;
         hasMissionActive = true;
         Debug.Log("Mission 2: Bring me a red bell pepper!");
+        
+        // NEW: Show "Go to supermarket" instruction
+        if (uiManager != null)
+        {
+            uiManager.ShowGoToSupermarketInstruction();
+        }
     }
 
     void StartMission3()
@@ -98,7 +112,14 @@ public class MissionManager : MonoBehaviour
         currentObjective = SupermarketItem.ItemType.Eggplant;
         hasMissionActive = true;
         Debug.Log("Mission 3: Bring me a purple eggplant!");
+        
+        // NEW: Show "Go to supermarket" instruction
+        if (uiManager != null)
+        {
+            uiManager.ShowGoToSupermarketInstruction();
+        }
     }
+
 
     public void OnItemDelivered(SupermarketItem item)
     {
@@ -112,10 +133,15 @@ public class MissionManager : MonoBehaviour
         if (!hasMissionActive)
         {
             Debug.LogWarning("❌ No mission active! Player brought item without mission.");
-            
             if (guideCharacter != null && noMissionDialogue != null)
             {
                 guideCharacter.PlayDialogue(noMissionDialogue);
+            }
+            
+            // NEW: Show error in UI
+            if (uiManager != null)
+            {
+                uiManager.ShowErrorState("No mission active!");
             }
             
             return;
@@ -125,25 +151,31 @@ public class MissionManager : MonoBehaviour
         if (item.itemType != currentObjective)
         {
             Debug.LogWarning($"❌ WRONG ITEM! Expected {currentObjective} but got {item.itemType}");
-            
             if (guideCharacter != null && wrongItemDialogue != null)
             {
                 guideCharacter.PlayDialogue(wrongItemDialogue);
             }
             
+            // NEW: Show error in UI
+            if (uiManager != null)
+            {
+                uiManager.ShowErrorState("Wrong item! Try again.");
+            }
+            
             return; // Don't proceed - let player try again
         }
         
-        Debug.Log("✓✓✓ CORRECT ITEM DELIVERED! Proceeding with reveal...");
-        hasMissionActive = false; // Mission completed
+         Debug.Log("✓✓✓ CORRECT ITEM DELIVERED! Proceeding with reveal...");
+        hasMissionActive = false;
         
-        // Remove color blindness effect (simulating taking off glasses)
+        // Remove color blindness effect
         RemoveColorBlindness();
         
-        // Wait a moment, then show the reveal
-        Debug.Log("Invoking ShowReveal in 1 second...");
-        Invoke("ShowReveal", 1f);
+        // NEW: Advance to next mission immediately (updates UI)
+        AdvanceToNextMission();
+        ShowReveal();
     }
+
 
     void RemoveColorBlindness()
     {
@@ -157,70 +189,76 @@ public class MissionManager : MonoBehaviour
         Debug.Log("✓ Glasses state reset - can pick up new glasses now");
     }
 
-    void ShowReveal()
+void ShowReveal()
+{
+    Debug.Log("=== ShowReveal CALLED ===");
+    
+    AudioClip revealDialogue = null;
+    
+    switch(currentPhase)
     {
-        Debug.Log("=== ShowReveal CALLED ===");
-        Debug.Log($"Current Phase in ShowReveal: {currentPhase}");
-
-        AudioClip revealDialogue = null;
-        switch(currentPhase)
-        {
-            case MissionPhase.Mission1_GetTomato:
-                revealDialogue = wrongTomatoDialogue;
-                Debug.Log($"Selected wrongTomatoDialogue: {wrongTomatoDialogue != null}");
-                break;
-            case MissionPhase.Mission2_GetPepper:
-                revealDialogue = wrongPepperDialogue;
-                Debug.Log($"Selected wrongPepperDialogue: {wrongPepperDialogue != null}");
-                break;
-            case MissionPhase.Mission3_GetEggplant:
-                revealDialogue = wrongEggplantDialogue;
-                Debug.Log($"Selected wrongEggplantDialogue: {wrongEggplantDialogue != null}");
-                break;
-            default:
-                Debug.LogWarning($"Unexpected phase: {currentPhase}");
-                break;
-        }
-
-        Debug.Log($"revealDialogue is null: {revealDialogue == null}");
-        Debug.Log($"guideCharacter is null: {guideCharacter == null}");
-        
-        if (revealDialogue != null && guideCharacter != null)
-        {
-            Debug.Log("*** PLAYING DIALOGUE NOW ***");
-            guideCharacter.PlayDialogue(revealDialogue);
-        }
-        else
-        {
-            if (revealDialogue == null)
-                Debug.LogError("revealDialogue is NULL!");
-            if (guideCharacter == null)
-                Debug.LogError("guideCharacter is NULL!");
-        }
-
-        Invoke("AdvanceToNextMission", 5f);
+        case MissionPhase.Mission1_Reveal:  // Changed from Mission1_GetTomato
+            revealDialogue = wrongTomatoDialogue;
+            break;
+        case MissionPhase.Mission2_Reveal:  // Changed from Mission2_GetPepper
+            revealDialogue = wrongPepperDialogue;
+            break;
+        case MissionPhase.Mission3_Reveal:  // Changed from Mission3_GetEggplant
+            revealDialogue = wrongEggplantDialogue;
+            break;
     }
+    
+    if (revealDialogue != null && guideCharacter != null)
+    {
+        Debug.Log("*** PLAYING DIALOGUE NOW ***");
+        guideCharacter.PlayDialogue(revealDialogue);
+    }
+    
+    // REMOVE: Invoke("AdvanceToNextMission", 5f);
+}
+
 
     void AdvanceToNextMission()
     {
         Debug.Log("=== AdvanceToNextMission CALLED ===");
+        
         switch(currentPhase)
         {
             case MissionPhase.Mission1_GetTomato:
                 currentPhase = MissionPhase.Mission1_Reveal;
                 GlassesInteractable.RemoveGlasses();
                 Debug.Log("Mission 1 complete! ✓ Glasses reset - Ready for Mission 2");
+                
+                // NEW: Update UI to show "pick up new glasses"
+                if (uiManager != null)
+                {
+                    uiManager.UpdateMissionText();
+                }
                 break;
+                
             case MissionPhase.Mission2_GetPepper:
                 currentPhase = MissionPhase.Mission2_Reveal;
                 GlassesInteractable.RemoveGlasses();
                 Debug.Log("Mission 2 complete! ✓ Glasses reset - Ready for Mission 3");
+                
+                // NEW: Update UI to show "pick up new glasses"
+                if (uiManager != null)
+                {
+                    uiManager.UpdateMissionText();
+                }
                 break;
+                
             case MissionPhase.Mission3_GetEggplant:
                 currentPhase = MissionPhase.Mission3_Reveal;
                 supermarketTasksComplete = true;
                 GlassesInteractable.RemoveGlasses();
                 Debug.Log("All missions complete! ✓ Glasses reset");
+                
+                // NEW: Update UI to show completion
+                if (uiManager != null)
+                {
+                    uiManager.UpdateMissionText();
+                }
                 
                 EnterRoom enterRoom = FindObjectOfType<EnterRoom>();
                 if (enterRoom != null)
@@ -230,4 +268,12 @@ public class MissionManager : MonoBehaviour
                 break;
         }
     }
+
+
+    // Add this method to MissionManager.cs
+    public MissionPhase GetCurrentPhase()
+    {
+        return currentPhase;
+    }
+
 }
