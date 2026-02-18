@@ -15,8 +15,9 @@ MonoBehaviour:
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
     hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
-  m_RendererFeatures: []
-  m_RendererFeatureMap:
+  m_RendererFeatures:
+  - {fileID: 2268570827140797140}
+  m_RendererFeatureMap: d4928adb25957b1f
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -55,3 +56,25 @@ MonoBehaviour:
   m_CopyDepthMode: 1
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &2268570827140797140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c612a04f30377488ab99171f946f8b84, type: 3}
+  m_Name: TunnelVisionRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  settings:
+    radius: 0.202
+    feather: 0.239
+    darkness: 1
+    strain: 0
+    warpStrength: 0.0002
+    blurStrength: 0
+    passEvent: 600
+  material: {fileID: 2100000, guid: 659f0464b177041199f60c348c8c3ccb, type: 2}

@@ -18,6 +18,10 @@ public class EnterRoom : MonoBehaviour
     public AudioSource streetBackgroundSound;
     public AudioSource classroomBackgroundSound;
 
+    
+    public TunnelVisionController tunnelController;
+
+
     // NEW: Physical blocking colliders for each door
     [Header("Door Blocking Colliders")]
     [Tooltip("Solid collider that blocks supermarket door when inactive")]
@@ -47,6 +51,8 @@ public class EnterRoom : MonoBehaviour
 
         // NEW: Initialize blockers - all doors start accessible
         UpdateDoorBlockers();
+
+        tunnelController.SetTunnelActive(false);
     }
 
     // NEW: Update which doors are physically blocked
@@ -104,6 +110,7 @@ public class EnterRoom : MonoBehaviour
                     uiManager.ShowScenarioInfo("Supermarket");
                     // This will update to show "Mission: Bring a ripe tomato" etc.
                 }
+                tunnelController.SetTunnelActive(false);
             }
 
             // STREET: Can only enter if supermarket tasks are NOT complete yet
@@ -133,6 +140,8 @@ public class EnterRoom : MonoBehaviour
                 {
                     uiManager.ShowScenarioInfo("Street");
                 }
+
+                tunnelController.SetTunnelActive(true);
             }
 
             // CLASSROOM: Can only enter if supermarket tasks are NOT complete yet
@@ -160,6 +169,7 @@ public class EnterRoom : MonoBehaviour
                 {
                     uiManager.ShowScenarioInfo("Classroom");
                 }
+                tunnelController.SetTunnelActive(false);
             }
         }
     }

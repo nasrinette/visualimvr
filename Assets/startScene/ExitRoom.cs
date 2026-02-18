@@ -17,10 +17,13 @@ public class ExitRoom : MonoBehaviour
     public GameObject baseRoom;
 
     // Start is called before the first frame update
- 
+
     public AudioSource supermarketBackgroundSound;
     public AudioSource streetBackgroundSound;
     public AudioSource classroomBackgroundSound;
+
+    public TunnelVisionController tunnelController;
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -37,12 +40,13 @@ public class ExitRoom : MonoBehaviour
             supermarketFrame.SetActive(true);
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
-            
-            if(streetBackgroundSound!=null)
+
+            if (streetBackgroundSound != null)
                 streetBackgroundSound.enabled = false;
-                
+            tunnelController.SetTunnelActive(false);
+
 
         }
     }
-   
+
 }
