@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class TunnelVisionInput : MonoBehaviour
 {
@@ -14,7 +15,6 @@ public class TunnelVisionInput : MonoBehaviour
     [Header("Material to drive")]
     public Material tunnelMaterial;
 
-    // TODO modify this when testing with headset & controllers
     [Header("Gesture")]
     public float gripThreshold = 0.4f;
     public float minDist = 0.20f;
@@ -42,40 +42,103 @@ public class TunnelVisionInput : MonoBehaviour
 
     bool wasGripsHeld;
 
+    // Runtime-created actions (used when Inspector bindings are empty)
+    InputAction runtimeLeftGrip;
+    InputAction runtimeRightGrip;
+
 
     void Awake()
     {
         currentRadius = baseRadius;
     }
 
+    void Start()
+    {
+        // Auto-find controllers if not assigned in Inspector
+        if (leftController == null || rightController == null)
+        {
+            var controllers = FindObjectsOfType<ActionBasedController>();
+            foreach (var c in controllers)
+            {
+                var go = c.gameObject;
+                string nameLower = go.name.ToLower();
+                if (nameLower.Contains("left") && leftController == null)
+                    leftController = go.transform;
+                else if (nameLower.Contains("right") && rightController == null)
+                    rightController = go.transform;
+            }
+
+            if (leftController != null) Debug.Log("[TunnelVisionInput] Auto-found left controller: " + leftController.name);
+            if (rightController != null) Debug.Log("[TunnelVisionInput] Auto-found right controller: " + rightController.name);
+        }
+
+        // If the Inspector-configured actions have no bindings, create runtime actions
+        if (!HasBindings(leftGrip))
+        {
+            Debug.Log("[TunnelVisionInput] leftGrip has no bindings, creating runtime action for left grip button");
+            runtimeLeftGrip = new InputAction("LeftGrip", InputActionType.Button);
+            runtimeLeftGrip.AddBinding("<XRController>{LeftHand}/gripButton");
+            runtimeLeftGrip.AddBinding("<XRController>{LeftHand}/grip");
+            runtimeLeftGrip.Enable();
+        }
+        else
+        {
+            leftGrip.action?.Enable();
+        }
+
+        if (!HasBindings(rightGrip))
+        {
+            Debug.Log("[TunnelVisionInput] rightGrip has no bindings, creating runtime action for right grip button");
+            runtimeRightGrip = new InputAction("RightGrip", InputActionType.Button);
+            runtimeRightGrip.AddBinding("<XRController>{RightHand}/gripButton");
+            runtimeRightGrip.AddBinding("<XRController>{RightHand}/grip");
+            runtimeRightGrip.Enable();
+        }
+        else
+        {
+            rightGrip.action?.Enable();
+        }
+    }
+
+    bool HasBindings(InputActionProperty prop)
+    {
+        if (prop.action == null) return false;
+        return prop.action.bindings.Count > 0;
+    }
+
+    InputAction GetLeftGripAction()
+    {
+        return runtimeLeftGrip != null ? runtimeLeftGrip : leftGrip.action;
+    }
+
+    InputAction GetRightGripAction()
+    {
+        return runtimeRightGrip != null ? runtimeRightGrip : rightGrip.action;
+    }
+
     void Update()
     {
         if (!tunnelMaterial || !leftController || !rightController) return;
 
-        // float lg = leftGrip.action.ReadValue<float>();
-        // float rg = rightGrip.action.ReadValue<float>();
-        // bool trying = lg > gripThreshold && rg > gripThreshold;//|| Input.GetKey(debugKey);
+        var leftAction = GetLeftGripAction();
+        var rightAction = GetRightGripAction();
 
-        bool leftHeld = leftGrip.action != null && leftGrip.action.IsPressed();
-        if (leftHeld) Debug.Log("pressed on left");
-        bool rightHeld = rightGrip.action != null && rightGrip.action.IsPressed();
-        if (rightHeld) Debug.Log("pressed on right");
+        bool leftHeld = leftAction != null && leftAction.IsPressed();
+        bool rightHeld = rightAction != null && rightAction.IsPressed();
         bool gripsHeld = leftHeld && rightHeld;
-        if (gripsHeld) Debug.Log("pressed on both");
+
         float currentDist = Vector3.Distance(leftController.position, rightController.position);
-        Debug.Log("current dist: "+currentDist);
+
         if (gripsHeld && !wasGripsHeld)
         {
             grabStartDist = currentDist;
         }
-
 
         float stretch = 0f;
 
         if (gripsHeld)
         {
             float delta = currentDist - grabStartDist;
-            Debug.Log("delta: "+delta);
             stretch = Mathf.InverseLerp(0f, maxStretchAmount, delta);
             stretch = Mathf.Clamp01(stretch);
         }
@@ -85,30 +148,19 @@ public class TunnelVisionInput : MonoBehaviour
 
         float targetRadius = baseRadius;
 
-
-
         if (trying)
         {
-            Debug.Log("ici");
-            // float dist = Vector3.Distance(leftController.position, rightController.position);
-            // float stretch = Mathf.InverseLerp(minDist, maxDist, dist);
-            // stretch = Mathf.Clamp01(stretch);
-            // stretch = 1f; // for now User is stretching at full strength.
-
             // Resistance (diminishing returns)
-            float resisted = 1f - Mathf.Exp(-3f * stretch); // makes expansion harder the more you push; we use exp to do so
+            float resisted = 1f - Mathf.Exp(-3f * stretch);
 
             targetRadius = baseRadius + maxExtraRadius * resisted;
 
-            // moves from currentRadius to targetRadius with t =. 1- ..
             currentRadius = Mathf.Lerp(currentRadius, targetRadius, 1f - Mathf.Exp(-expandSpeed * Time.deltaTime));
             radiusVel = 0f;
             strain = Mathf.Lerp(strain, 1f, 1f - Mathf.Exp(-10f * Time.deltaTime));
         }
         else
         {
-            // does the same as when trying but "inverse" (from current to base radius) and with snapSpeed > expandSpeed
-            // currentRadius = Mathf.Lerp(currentRadius, baseRadius, 1f - Mathf.Exp(-snapSpeed * Time.deltaTime));
             currentRadius = Mathf.SmoothDamp(currentRadius, baseRadius, ref radiusVel, snapTime);
             strain = Mathf.Lerp(strain, 0f, 1f - Mathf.Exp(-18f * Time.deltaTime));
         }
@@ -128,11 +180,15 @@ public class TunnelVisionInput : MonoBehaviour
         wasGripsHeld = gripsHeld;
         previousDist = currentDist;
 
-
         tunnelMaterial.SetFloat("_Strain", strain);
         tunnelMaterial.SetFloat("_Snap", snap);
-
-
     }
 
+    void OnDestroy()
+    {
+        runtimeLeftGrip?.Disable();
+        runtimeLeftGrip?.Dispose();
+        runtimeRightGrip?.Disable();
+        runtimeRightGrip?.Dispose();
+    }
 }
