@@ -57,10 +57,13 @@ public class TunnelVisionInput : MonoBehaviour
         // bool trying = lg > gripThreshold && rg > gripThreshold;//|| Input.GetKey(debugKey);
 
         bool leftHeld = leftGrip.action != null && leftGrip.action.IsPressed();
+        if (leftHeld) Debug.Log("pressed on left");
         bool rightHeld = rightGrip.action != null && rightGrip.action.IsPressed();
+        if (rightHeld) Debug.Log("pressed on right");
         bool gripsHeld = leftHeld && rightHeld;
+        if (gripsHeld) Debug.Log("pressed on both");
         float currentDist = Vector3.Distance(leftController.position, rightController.position);
-
+        Debug.Log("current dist: "+currentDist);
         if (gripsHeld && !wasGripsHeld)
         {
             grabStartDist = currentDist;
@@ -72,6 +75,7 @@ public class TunnelVisionInput : MonoBehaviour
         if (gripsHeld)
         {
             float delta = currentDist - grabStartDist;
+            Debug.Log("delta: "+delta);
             stretch = Mathf.InverseLerp(0f, maxStretchAmount, delta);
             stretch = Mathf.Clamp01(stretch);
         }
