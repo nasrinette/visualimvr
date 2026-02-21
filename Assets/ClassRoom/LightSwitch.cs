@@ -11,11 +11,23 @@ public class LightSwitch : MonoBehaviour
     [Tooltip("Renderer for the switch itself (changes color: green=ON, red=OFF)")]
     public Renderer switchRenderer;
 
+    [Header("Switch Toggle Animation")]
+    [Tooltip("The toggle part of the switch model (auto-found child named 'Switch.001' if empty)")]
+    public Transform switchToggle;
+    [Tooltip("Degrees to rotate on local X axis when ON (negative = flip down)")]
+    public float toggleFlipAngle = -10f;
+
+    [Header("Sound")]
+    [Tooltip("Sound played when switch is toggled")]
+    public AudioClip toggleSound;
+
     [Header("State")]
     [SerializeField] private bool lightsOn = false;
     public bool IsOn => lightsOn;
 
     private XRSimpleInteractable interactable;
+    private Quaternion toggleOriginalRotation;
+    private AudioSource audioSource;
 
     private static readonly Color switchOnColor = new Color(0.1f, 0.8f, 0.1f);
     private static readonly Color switchOffColor = new Color(0.8f, 0.1f, 0.1f);
@@ -23,6 +35,11 @@ public class LightSwitch : MonoBehaviour
     void Awake()
     {
         interactable = GetComponent<XRSimpleInteractable>();
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f;
     }
 
     void OnEnable()
@@ -39,13 +56,24 @@ public class LightSwitch : MonoBehaviour
 
     void Start()
     {
+        if (switchToggle == null)
+            switchToggle = transform.Find("Switch.001");
+        if (switchToggle != null)
+            toggleOriginalRotation = switchToggle.localRotation;
         ApplyLightState();
     }
 
     void OnSwitchPressed(SelectEnterEventArgs args)
     {
+        Toggle();
+    }
+
+    public void Toggle()
+    {
         lightsOn = !lightsOn;
         ApplyLightState();
+        if (toggleSound != null && audioSource != null)
+            audioSource.PlayOneShot(toggleSound);
         Debug.Log($"Light switch toggled: lights are now {(lightsOn ? "ON" : "OFF")}");
     }
 
@@ -59,5 +87,12 @@ public class LightSwitch : MonoBehaviour
 
         if (switchRenderer != null)
             switchRenderer.material.color = lightsOn ? switchOnColor : switchOffColor;
+
+        if (switchToggle != null)
+        {
+            switchToggle.localRotation = lightsOn
+                ? toggleOriginalRotation * Quaternion.Euler(0f, 0f, toggleFlipAngle)
+                : toggleOriginalRotation;
+        }
     }
 }

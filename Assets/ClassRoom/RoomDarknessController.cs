@@ -105,7 +105,7 @@ public class RoomDarknessController : MonoBehaviour
     /// Returns 0 = fully bright, 1 = fully dark.
     /// Room is dark only when ALL curtains are closed AND ALL lights are off.
     /// </summary>
-    float CalculateDarkness()
+    public float CalculateDarkness()
     {
         // Curtain factor: average of how closed each curtain is (0=open, 1=closed)
         float curtainsClosed = 0f;

@@ -53,6 +53,11 @@ public class CurtainInteraction : MonoBehaviour
     [Tooltip("Multiplier for hand movement to curtain movement")]
     public float sensitivity = 1f;
 
+    [Header("Sound")]
+    [Tooltip("Sound played while curtains are moving")]
+    public AudioClip curtainSound;
+
+    private AudioSource audioSource;
     private IXRSelectInteractor leftInteractor;
     private IXRSelectInteractor rightInteractor;
     private Vector3 leftGrabStartWorld;
@@ -93,6 +98,13 @@ public class CurtainInteraction : MonoBehaviour
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f;
+        audioSource.loop = true;
+
         if (leftCurtain != null) leftTargetX = leftCurtain.localPosition.x;
         if (rightCurtain != null) rightTargetX = rightCurtain.localPosition.x;
         ApplyScaleFromPosition();
@@ -104,12 +116,14 @@ public class CurtainInteraction : MonoBehaviour
         leftInteractor = args.interactorObject;
         leftGrabStartWorld = GetInteractorPosition(leftInteractor);
         leftCurtainGrabStartX = leftTargetX;
+        PlayCurtainSound();
         Debug.Log("Left curtain hook grabbed");
     }
 
     void OnLeftHookReleased(SelectExitEventArgs args)
     {
         leftInteractor = null;
+        if (rightInteractor == null) StopCurtainSound();
         Debug.Log("Left curtain hook released");
     }
 
@@ -118,13 +132,30 @@ public class CurtainInteraction : MonoBehaviour
         rightInteractor = args.interactorObject;
         rightGrabStartWorld = GetInteractorPosition(rightInteractor);
         rightCurtainGrabStartX = rightTargetX;
+        PlayCurtainSound();
         Debug.Log("Right curtain hook grabbed");
     }
 
     void OnRightHookReleased(SelectExitEventArgs args)
     {
         rightInteractor = null;
+        if (leftInteractor == null) StopCurtainSound();
         Debug.Log("Right curtain hook released");
+    }
+
+    void PlayCurtainSound()
+    {
+        if (curtainSound != null && audioSource != null && !audioSource.isPlaying)
+        {
+            audioSource.clip = curtainSound;
+            audioSource.Play();
+        }
+    }
+
+    void StopCurtainSound()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+            audioSource.Stop();
     }
 
     void Update()
