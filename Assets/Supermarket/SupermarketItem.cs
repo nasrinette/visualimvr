@@ -6,7 +6,7 @@ public class SupermarketItem : MonoBehaviour
     {
         Tomato,
         BellPepper,
-        Eggplant,
+        Grapes,
         Zucchini
     }
     

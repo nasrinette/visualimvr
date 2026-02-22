@@ -6,17 +6,19 @@ public class MissionManager : MonoBehaviour
     public enum MissionPhase
     {
         Introduction,
-        Mission1_GetTomato,
-        Mission1_Reveal,
-        Mission2_GetPepper,
-        Mission2_Reveal,
-        Mission3_GetEggplant,
-        Mission3_Reveal,
-        Complete
+        Mission_GetTomato,
+        Mission_GetPepper,
+        Mission_GetGrapes,
+        AllComplete
     }
 
     [Header("Current State")]
     [SerializeField] private MissionPhase currentPhase = MissionPhase.Introduction;
+
+    // Track each mission independently
+    private bool tomatoComplete = false;
+    private bool pepperComplete = false;
+    private bool grapesComplete = false;
 
     private bool hasGrabbedGlasses = false;
     private bool supermarketTasksComplete = false;
@@ -27,12 +29,12 @@ public class MissionManager : MonoBehaviour
     [Header("Table Items (disabled by default in scene)")]
     [SerializeField] private GameObject tableTomato;
     [SerializeField] private GameObject tableBellPepper;
-    [SerializeField] private GameObject tableEggplant;
+    [SerializeField] private GameObject tableGrapes;
 
     [Header("Reveal Dialogues")]
     [SerializeField] private AudioClip wrongTomatoDialogue;
     [SerializeField] private AudioClip wrongPepperDialogue;
-    [SerializeField] private AudioClip wrongEggplantDialogue;
+    [SerializeField] private AudioClip wrongGrapesDialogue;
 
     [Header("Error Dialogues")]
     [SerializeField] private AudioClip wrongItemDialogue;
@@ -55,15 +57,12 @@ public class MissionManager : MonoBehaviour
         GlassesInteractable.RemoveGlasses();
     }
 
-    public bool HasGrabbedGlasses()
-    {
-        return hasGrabbedGlasses;
-    }
-
-    public bool AreSupermarketTasksComplete()
-    {
-        return supermarketTasksComplete;
-    }
+    public bool HasGrabbedGlasses() => hasGrabbedGlasses;
+    public bool AreSupermarketTasksComplete() => supermarketTasksComplete;
+    public MissionPhase GetCurrentPhase() => currentPhase;
+    public bool IsTomatoComplete() => tomatoComplete;
+    public bool IsPepperComplete() => pepperComplete;
+    public bool IsGrapesComplete() => grapesComplete;
 
     public void OnGlassesPickedUp(ColorblindTypes glassType)
     {
@@ -71,43 +70,43 @@ public class MissionManager : MonoBehaviour
         switch (glassType)
         {
             case ColorblindTypes.Protanopia:
-                StartMission1();
+                if (!tomatoComplete) StartMissionTomato();
                 break;
             case ColorblindTypes.Deuteranopia:
-                StartMission2();
+                if (!pepperComplete) StartMissionPepper();
                 break;
             case ColorblindTypes.Tritanopia:
-                StartMission3();
+                if (!grapesComplete) StartMissionGrapes();
                 break;
         }
     }
 
-    void StartMission1()
+    void StartMissionTomato()
     {
-        currentPhase = MissionPhase.Mission1_GetTomato;
+        currentPhase = MissionPhase.Mission_GetTomato;
         currentObjective = SupermarketItem.ItemType.Tomato;
         hasMissionActive = true;
-        Debug.Log("Mission 1: Bring me a ripe tomato!");
+        Debug.Log("Mission: Bring me a ripe tomato!");
         if (uiManager != null)
             uiManager.ShowGoToSupermarketInstruction();
     }
 
-    void StartMission2()
+    void StartMissionPepper()
     {
-        currentPhase = MissionPhase.Mission2_GetPepper;
+        currentPhase = MissionPhase.Mission_GetPepper;
         currentObjective = SupermarketItem.ItemType.BellPepper;
         hasMissionActive = true;
-        Debug.Log("Mission 2: Bring me a red bell pepper!");
+        Debug.Log("Mission: Bring me a green bell pepper!");
         if (uiManager != null)
             uiManager.ShowGoToSupermarketInstruction();
     }
 
-    void StartMission3()
+    void StartMissionGrapes()
     {
-        currentPhase = MissionPhase.Mission3_GetEggplant;
-        currentObjective = SupermarketItem.ItemType.Eggplant;
+        currentPhase = MissionPhase.Mission_GetGrapes;
+        currentObjective = SupermarketItem.ItemType.Grapes;
         hasMissionActive = true;
-        Debug.Log("Mission 3: Bring me a purple eggplant!");
+        Debug.Log("Mission: Bring me purple grapes!");
         if (uiManager != null)
             uiManager.ShowGoToSupermarketInstruction();
     }
@@ -143,23 +142,28 @@ public class MissionManager : MonoBehaviour
         Debug.Log("✓✓✓ CORRECT ITEM DELIVERED! Proceeding with reveal...");
         hasMissionActive = false;
 
-        // Reveal the corresponding table item
+        // Reveal table item and mark mission complete
         switch (item.itemType)
         {
             case SupermarketItem.ItemType.Tomato:
                 if (tableTomato != null) tableTomato.SetActive(true);
+                tomatoComplete = true;
+                ShowReveal(wrongTomatoDialogue);
                 break;
             case SupermarketItem.ItemType.BellPepper:
                 if (tableBellPepper != null) tableBellPepper.SetActive(true);
+                pepperComplete = true;
+                ShowReveal(wrongPepperDialogue);
                 break;
-            case SupermarketItem.ItemType.Eggplant:
-                if (tableEggplant != null) tableEggplant.SetActive(true);
+            case SupermarketItem.ItemType.Grapes:
+                if (tableGrapes != null) tableGrapes.SetActive(true);
+                grapesComplete = true;
+                ShowReveal(wrongGrapesDialogue);
                 break;
         }
 
         RemoveColorBlindness();
-        AdvanceToNextMission();
-        ShowReveal();
+        CheckAllMissionsComplete();
     }
 
     void RemoveColorBlindness()
@@ -173,22 +177,8 @@ public class MissionManager : MonoBehaviour
         Debug.Log("✓ Glasses state reset - can pick up new glasses now");
     }
 
-    void ShowReveal()
+    void ShowReveal(AudioClip revealDialogue)
     {
-        Debug.Log("=== ShowReveal CALLED ===");
-        AudioClip revealDialogue = null;
-        switch (currentPhase)
-        {
-            case MissionPhase.Mission1_Reveal:
-                revealDialogue = wrongTomatoDialogue;
-                break;
-            case MissionPhase.Mission2_Reveal:
-                revealDialogue = wrongPepperDialogue;
-                break;
-            case MissionPhase.Mission3_Reveal:
-                revealDialogue = wrongEggplantDialogue;
-                break;
-        }
         if (revealDialogue != null && guideCharacter != null)
         {
             Debug.Log("*** PLAYING DIALOGUE NOW ***");
@@ -196,41 +186,24 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-    void AdvanceToNextMission()
+    void CheckAllMissionsComplete()
     {
-        Debug.Log("=== AdvanceToNextMission CALLED ===");
-        switch (currentPhase)
+        if (tomatoComplete && pepperComplete && grapesComplete)
         {
-            case MissionPhase.Mission1_GetTomato:
-                currentPhase = MissionPhase.Mission1_Reveal;
-                GlassesInteractable.RemoveGlasses();
-                Debug.Log("Mission 1 complete! ✓ Glasses reset - Ready for Mission 2");
-                if (uiManager != null)
-                    uiManager.UpdateMissionText();
-                break;
-            case MissionPhase.Mission2_GetPepper:
-                currentPhase = MissionPhase.Mission2_Reveal;
-                GlassesInteractable.RemoveGlasses();
-                Debug.Log("Mission 2 complete! ✓ Glasses reset - Ready for Mission 3");
-                if (uiManager != null)
-                    uiManager.UpdateMissionText();
-                break;
-            case MissionPhase.Mission3_GetEggplant:
-                currentPhase = MissionPhase.Mission3_Reveal;
-                supermarketTasksComplete = true;
-                GlassesInteractable.RemoveGlasses();
-                Debug.Log("All missions complete! ✓ Glasses reset");
-                if (uiManager != null)
-                    uiManager.UpdateMissionText();
-                EnterRoom enterRoom = FindObjectOfType<EnterRoom>();
-                if (enterRoom != null)
-                    enterRoom.RefreshDoorBlockers();
-                break;
+            currentPhase = MissionPhase.AllComplete;
+            supermarketTasksComplete = true;
+            Debug.Log("All missions complete! ✓");
+            if (uiManager != null)
+                uiManager.UpdateMissionText();
+            EnterRoom enterRoom = FindObjectOfType<EnterRoom>();
+            if (enterRoom != null)
+                enterRoom.RefreshDoorBlockers();
         }
-    }
-
-    public MissionPhase GetCurrentPhase()
-    {
-        return currentPhase;
+        else
+        {
+            currentPhase = MissionPhase.Introduction; // Back to idle, waiting for next glasses
+            if (uiManager != null)
+                uiManager.UpdateMissionText();
+        }
     }
 }
