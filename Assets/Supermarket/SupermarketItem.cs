@@ -16,6 +16,8 @@ public class SupermarketItem : MonoBehaviour
     [Header("Visual")]
     public Color actualColor; // The "real" color (for debugging/reference)
     
+
+    
     void Start()
     {
         // Ensure the item has a Rigidbody for physics
