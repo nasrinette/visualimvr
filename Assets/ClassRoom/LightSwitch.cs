@@ -28,6 +28,7 @@ public class LightSwitch : MonoBehaviour
     private XRSimpleInteractable interactable;
     private Quaternion toggleOriginalRotation;
     private AudioSource audioSource;
+    private bool initialized;
 
     private static readonly Color switchOnColor = new Color(0.1f, 0.8f, 0.1f);
     private static readonly Color switchOffColor = new Color(0.8f, 0.1f, 0.1f);
@@ -46,6 +47,13 @@ public class LightSwitch : MonoBehaviour
     {
         if (interactable != null)
             interactable.selectEntered.AddListener(OnSwitchPressed);
+
+        // Reset to OFF every time the classroom activates
+        if (initialized)
+        {
+            lightsOn = false;
+            ApplyLightState();
+        }
     }
 
     void OnDisable()
@@ -60,7 +68,9 @@ public class LightSwitch : MonoBehaviour
             switchToggle = transform.Find("Switch.001");
         if (switchToggle != null)
             toggleOriginalRotation = switchToggle.localRotation;
+        lightsOn = false;
         ApplyLightState();
+        initialized = true;
     }
 
     void OnSwitchPressed(SelectEnterEventArgs args)

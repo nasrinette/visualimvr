@@ -9,7 +9,6 @@ public class TunnelVisionController : MonoBehaviour
 
     void Awake()
     {
-        // Find the feature inside the renderer
         foreach (var feature in rendererData.rendererFeatures)
         {
             if (feature is TunnelVisionRendererFeature tv)

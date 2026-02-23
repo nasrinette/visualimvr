@@ -14,11 +14,13 @@ public class EnterRoom : MonoBehaviour
     public Collider supermarketCollider;
     public Collider streetCollider;
     public Collider classroomCollider;
-    public AudioSource supermarketBackgroundSound;
-    public AudioSource streetBackgroundSound;
-    public AudioSource classroomBackgroundSound;
 
-    
+    public GameObject doorStreet;
+    public AudioSource audioSource;
+
+    public AudioClip streetBackgroundSound;
+
+
     public TunnelVisionController tunnelController;
 
 
@@ -32,7 +34,7 @@ public class EnterRoom : MonoBehaviour
     public Collider classroomBlocker;
     [Header("UI")]
     public ScenarioUIManager uiManager;
-    
+
     private MissionManager missionManager;
     public AudioSource blockedEntrySound;
 
@@ -52,7 +54,7 @@ public class EnterRoom : MonoBehaviour
         // NEW: Initialize blockers - all doors start accessible
         UpdateDoorBlockers();
 
-        tunnelController.SetTunnelActive(false);
+        if (tunnelController != null) tunnelController.SetTunnelActive(false);
     }
 
     // NEW: Update which doors are physically blocked
@@ -96,27 +98,27 @@ public class EnterRoom : MonoBehaviour
                         blockedEntrySound.Play();
                     return;
                 }
-                
+
                 supermarket.SetActive(true);
                 street.SetActive(false);
                 classroom.SetActive(false);
                 baseRoom.SetActive(false);
                 streetFrame.SetActive(false);
                 classroomFrame.SetActive(false);
-                
+
                 // NEW: Update UI to show the specific mission item
                 if (uiManager != null)
                 {
                     uiManager.ShowScenarioInfo("Supermarket");
                     // This will update to show "Mission: Bring a ripe tomato" etc.
                 }
-                tunnelController.SetTunnelActive(false);
+                if (tunnelController!=null) tunnelController.SetTunnelActive(false);
             }
 
             // STREET: Can only enter if supermarket tasks are NOT complete yet
             if (gameObject == streetCollider.gameObject)
             {
-                if (missionManager != null && missionManager.HasGrabbedGlasses() 
+                if (missionManager != null && missionManager.HasGrabbedGlasses()
                     && !missionManager.AreSupermarketTasksComplete())
                 {
                     Debug.Log("Cannot enter street - finish supermarket tasks first!");
@@ -132,8 +134,17 @@ public class EnterRoom : MonoBehaviour
                 baseRoom.SetActive(false);
                 supermarketFrame.SetActive(false);
                 classroomFrame.SetActive(false);
-                if(streetBackgroundSound != null)
-                    streetBackgroundSound.enabled = true;
+
+                if (audioSource != null && streetBackgroundSound != null)
+                {
+                    audioSource.loop = false;
+                    audioSource.clip = streetBackgroundSound;
+                    audioSource.Play();
+                }
+
+
+
+                if (doorStreet != null) doorStreet.SetActive(false);
 
                 // NEW: Show scenario UI
                 if (uiManager != null)
@@ -141,13 +152,13 @@ public class EnterRoom : MonoBehaviour
                     uiManager.ShowScenarioInfo("Street");
                 }
 
-                tunnelController.SetTunnelActive(true);
+                if (tunnelController!=null) tunnelController.SetTunnelActive(true);
             }
 
             // CLASSROOM: Can only enter if supermarket tasks are NOT complete yet
             if (gameObject == classroomCollider.gameObject)
             {
-                if (missionManager != null && missionManager.HasGrabbedGlasses() 
+                if (missionManager != null && missionManager.HasGrabbedGlasses()
                     && !missionManager.AreSupermarketTasksComplete())
                 {
                     Debug.Log("Cannot enter classroom - finish supermarket tasks first!");
@@ -169,7 +180,7 @@ public class EnterRoom : MonoBehaviour
                 {
                     uiManager.ShowScenarioInfo("Classroom");
                 }
-                tunnelController.SetTunnelActive(false);
+                if (tunnelController!=null) tunnelController.SetTunnelActive(false);
             }
         }
     }

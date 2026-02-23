@@ -25,13 +25,23 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _ArrowAngleWidth: 0.157
+    - _ArrowLength: 0.04
+    - _ArrowPulseAmp: 0.0106
+    - _ArrowPulseSpeed: 2.8
+    - _ArrowStrength: 0.845
     - _Darkness: 1
+    - _EdgeGlow: 0
     - _EdgeWidth: 0.08
+    - _EdgeWidth2: 0.02
     - _Feather: 0.24
+    - _GlowWidth: 0.013
     - _Radius: 0.18
+    - _ShowArrows: 0
     - _Snap: 0
     - _Strain: 0
-    - _WarpStrength: 0.02
+    - _WarpStrength: 0.0002
     m_Colors:
     - _CenterUV: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _EdgeGlowColor: {r: 1, g: 0.8, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

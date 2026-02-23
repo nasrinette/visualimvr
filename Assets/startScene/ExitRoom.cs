@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ExitRoom : MonoBehaviour
 {
-
     public GameObject supermarket;
     public GameObject street;
     public GameObject classroom;
@@ -13,20 +12,27 @@ public class ExitRoom : MonoBehaviour
     public GameObject streetFrame;
     public GameObject classroomFrame;
 
-
     public GameObject baseRoom;
-
-    // Start is called before the first frame update
-
-    public AudioSource supermarketBackgroundSound;
-    public AudioSource streetBackgroundSound;
-    public AudioSource classroomBackgroundSound;
 
     public TunnelVisionController tunnelController;
 
+    public AudioSource audioSource;
+
+
+    [Tooltip("Seconds to ignore triggers after room activates (prevents instant exit on entry)")]
+    public float entryCooldown = 1f;
+
+    private float activationTime;
+
+    void OnEnable()
+    {
+        activationTime = Time.time;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (Time.time - activationTime < entryCooldown) return;
+
         if (other.CompareTag("MainCamera"))
         {
             Debug.Log("exit");
@@ -34,19 +40,20 @@ public class ExitRoom : MonoBehaviour
             street.SetActive(false);
             classroom.SetActive(false);
 
-
             baseRoom.SetActive(true);
 
             supermarketFrame.SetActive(true);
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
 
-            if (streetBackgroundSound != null)
-                streetBackgroundSound.enabled = false;
-            tunnelController.SetTunnelActive(false);
+            if (audioSource != null)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
 
+            }
 
+            if (tunnelController !=null) tunnelController.SetTunnelActive(false);
         }
     }
-
 }

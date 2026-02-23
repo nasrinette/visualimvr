@@ -67,6 +67,7 @@ public class CurtainInteraction : MonoBehaviour
 
     private float leftTargetX;
     private float rightTargetX;
+    private bool initialized;
 
     void OnEnable()
     {
@@ -80,6 +81,10 @@ public class CurtainInteraction : MonoBehaviour
             rightHook.selectEntered.AddListener(OnRightHookGrabbed);
             rightHook.selectExited.AddListener(OnRightHookReleased);
         }
+
+        // Reset curtains to fully open on every classroom entry
+        if (initialized)
+            ResetToOpen();
     }
 
     void OnDisable()
@@ -109,6 +114,7 @@ public class CurtainInteraction : MonoBehaviour
         if (rightCurtain != null) rightTargetX = rightCurtain.localPosition.x;
         ApplyScaleFromPosition();
         UpdateHookPositions();
+        initialized = true;
     }
 
     void OnLeftHookGrabbed(SelectEnterEventArgs args)
@@ -316,6 +322,29 @@ public class CurtainInteraction : MonoBehaviour
         if (rightCurtain != null)
             rightT = Mathf.InverseLerp(rightOpenX, rightClosedX, rightCurtain.localPosition.x);
         return (leftT + rightT) * 0.5f;
+    }
+
+    private void ResetToOpen()
+    {
+        leftTargetX = leftOpenX;
+        rightTargetX = rightOpenX;
+
+        // Snap curtain positions immediately (no animation)
+        if (leftCurtain != null)
+        {
+            Vector3 pos = leftCurtain.localPosition;
+            pos.x = leftOpenX;
+            leftCurtain.localPosition = pos;
+        }
+        if (rightCurtain != null)
+        {
+            Vector3 pos = rightCurtain.localPosition;
+            pos.x = rightOpenX;
+            rightCurtain.localPosition = pos;
+        }
+
+        ApplyScaleFromPosition();
+        UpdateHookPositions();
     }
 
     public void DebugSetOpen() => SetTargets(leftOpenX, rightOpenX);

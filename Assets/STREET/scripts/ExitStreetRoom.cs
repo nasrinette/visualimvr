@@ -24,6 +24,9 @@ public class ExitStreetRoom : MonoBehaviour
     public Transform xrOrigin;           // XR Origin transform
     public Transform destination;        // where player should appear
 
+    public GameObject doorStreet;
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -49,6 +52,8 @@ public class ExitStreetRoom : MonoBehaviour
             audioSource.Play();
 
             tunnelController.SetTunnelActive(false);
+
+            doorStreet.SetActive(true);
         }
     }
 

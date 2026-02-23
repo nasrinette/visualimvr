@@ -22,7 +22,7 @@ public class TunnelVisionInput : MonoBehaviour
     public float maxDist = 0.60f;
 
     [Header("Tunnel")]
-    public float baseRadius = 0.18f;
+    public float baseRadius = 0.15f;
     public float maxExtraRadius = 0.08f;
     public float expandSpeed = 12f;
     public float snapSpeed = 18f;
@@ -47,13 +47,14 @@ public class TunnelVisionInput : MonoBehaviour
 
     InputAction runtimeLeftGrip;
     InputAction runtimeRightGrip;
+    bool wasTrying;
 
     void Awake()
     {
         currentRadius = baseRadius;
     }
 
-     void Start()
+    void Start()
     {
         // If the Inspector-configured actions have no bindings, create runtime actions
         if (!HasBindings(leftGrip))
@@ -101,7 +102,8 @@ public class TunnelVisionInput : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.P)) {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
             Debug.Log("P pressed");
             scenario.OnTunnelExpandAttempted();
         }
@@ -112,7 +114,7 @@ public class TunnelVisionInput : MonoBehaviour
         var rightAction = GetRightGripAction();
 
         bool leftHeld = leftAction != null && leftAction.IsPressed();
-         if (leftHeld) Debug.Log("pressed on left");
+        if (leftHeld) Debug.Log("pressed on left");
 
         bool rightHeld = rightAction != null && rightAction.IsPressed();
         if (rightHeld) Debug.Log("pressed on right");
@@ -146,7 +148,14 @@ public class TunnelVisionInput : MonoBehaviour
 
         if (trying)
         {
-            scenario.OnTunnelExpandAttempted();
+            if (!wasTrying)
+            {
+                scenario.OnTunnelExpandAttempted();
+
+            }
+
+            wasTrying = trying;
+            // scenario.OnTunnelExpandAttempted();
             // float dist = Vector3.Distance(leftController.position, rightController.position);
             // float stretch = Mathf.InverseLerp(minDist, maxDist, dist);
             // stretch = Mathf.Clamp01(stretch);
@@ -189,9 +198,27 @@ public class TunnelVisionInput : MonoBehaviour
         tunnelMaterial.SetFloat("_Strain", strain);
         tunnelMaterial.SetFloat("_Snap", snap);
 
+        // when we are in the try expand audio (explanation), we make the help arrows appear
+        // otherwise they disappear
+        bool inTryExpand = scenario != null && scenario.CurrentPhase == ScenarioNarration.Phase.TryExpandTunnel;
 
+        float showArrows = (inTryExpand && !trying) ? 1f : 0f;
+
+        // float glow = 0f;
+        // if (inTryExpand) glow = 0.25f;
+        // if (gripsHeld) glow = 0.3f;
+
+        tunnelMaterial.SetFloat("_ShowArrows", showArrows);
+        // tunnelMaterial.SetFloat("_EdgeGlow", glow);
     }
 
+    public void ReduceBaseRadius(float amount)
+    {
+        baseRadius = Mathf.Max(0f, baseRadius - amount);
+        // currentRadius = Mathf.Min(currentRadius, baseRadius);
+
+        Debug.Log($"[TUNNEL] baseRadius reduced -> {baseRadius}");
+    }
     void OnDestroy()
     {
         runtimeLeftGrip?.Disable();

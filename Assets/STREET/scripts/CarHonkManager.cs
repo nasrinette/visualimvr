@@ -18,6 +18,8 @@ public class CarHonkManager : MonoBehaviour
 
     bool busy;
 
+    public TunnelVisionInput tunnelVisionInput;
+
     public bool TryHonkNow()
     {
         // if (busy) return false; // todo fix that??
@@ -32,7 +34,6 @@ public class CarHonkManager : MonoBehaviour
 
     IEnumerator Honk(CinemachineDollyCart car)
     {
-        Debug.Log("HONK!!");
         busy = true;
 
         car.m_Speed = 0f;
@@ -45,6 +46,11 @@ public class CarHonkManager : MonoBehaviour
         yield return new WaitForSeconds(stopDuration);
 
         busy = false;
+         if (tunnelVisionInput != null)
+        {
+            tunnelVisionInput.ReduceBaseRadius(0.02f);
+
+        }
     }
 
 }

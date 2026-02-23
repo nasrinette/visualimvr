@@ -14,7 +14,20 @@ Shader "Hidden/TunnelVisionFullscreen"
         _Strain("Strain", Float) = 0
         _Snap("Snap", Float) = 0
 
+        // edge glow around (explanation)
+        // _EdgeGlow ("Edge Glow", Range(0,1)) = 0
+        // _GlowWidth ("Glow Width", Range(0,0.2)) = 0.02
+        
+        // arrows (explanation)
+        _ShowArrows ("Show Arrows", Range(0,1)) = 0 // either yes or no
+        _ArrowStrength ("Arrow Strength", Range(0,1)) = 0.8
+        _ArrowAngleWidth ("Arrow Angle Width (rad)", Range(0.01,1.0)) = 0.25
+        _ArrowLength ("Arrow Length", Range(0.01,0.3)) = 0.08
+        _ArrowPulseAmp ("Arrow Pulse Amp", Range(0,0.05)) = 0.01
+        _ArrowPulseSpeed ("Arrow Pulse Speed", Range(0,10)) = 3
+        // _EdgeGlowColor ("Edge Glow Color", Color) = (1,0.8,0.2,1)
     }
+
     // contains shader code
     SubShader
     {
@@ -44,6 +57,12 @@ Shader "Hidden/TunnelVisionFullscreen"
             float _Radius, _Feather, _Darkness;
             float4 _CenterUV;
             float _WarpStrength, _EdgeWidth, _Strain, _Snap, _BlurStrength;
+
+            // float _EdgeGlow, _GlowWidth;
+            float _ShowArrows, _ArrowStrength, _ArrowAngleWidth, _ArrowLength;
+            float _ArrowPulseAmp, _ArrowPulseSpeed;
+            // float4 _EdgeGlowColor;
+
             // The structure definition defines which variables it contains.
             // This example uses the Attributes structure as an input structure in
             // the vertex shader.
@@ -62,6 +81,21 @@ Shader "Hidden/TunnelVisionFullscreen"
                 float2 uv : TEXCOORD0;
                 UNITY_VERTEX_OUTPUT_STEREO // for vr
             };
+            
+            #define PI 3.14159265
+            float WrapAngle(float a)
+            {
+                // Wrap to [-PI, PI]
+                // I found this function online
+                a = fmod(a + PI, 2.0 * PI);
+                if (a < 0) a += 2.0 * PI;
+                return a - PI;
+            }
+
+            float AngleDist(float a, float b)
+            {
+                return abs(WrapAngle(a - b));
+            }
 
             TunnelVisionVaryings Vert (TunnelVisionAttributes IN)
             {
@@ -116,6 +150,47 @@ Shader "Hidden/TunnelVisionFullscreen"
                 // if the mask is 0, it means we are at the center, then lerp is 1, so we don't change the color of that pixel
                 // if mask = 1, then we are outside, so pixel becomes very dark (darkness=1)
                 col.rgb *= lerp(1.0, 1.0 - _Darkness, mask);
+                
+                // FOR OUTLINE 
+              
+
+                // edgeBand = 1 near dist==r, 0 away
+                // float edgeBand = 1.0 - smoothstep(0.0, _GlowWidth, abs(d - _Radius));
+                // col.rgb += edgeBand * _EdgeGlow * _EdgeGlowColor.rgb;
+
+
+
+                // FOR ARROWS
+                float2 p = uv - _CenterUV.xy;
+                float ang  = atan2(p.y, p.x); // [-PI, PI]
+                
+                float pulse = sin(_Time.y * _ArrowPulseSpeed) * _ArrowPulseAmp; // ocillate between -1 and 1
+
+                // how far outward from the tunnel edge 
+                // 0 at edge, 1 at arrow tip (outward)
+                float u = (d - (_Radius + pulse)) / _ArrowLength; 
+
+               
+                // angular distance from arrow centers
+                float angDistRight = AngleDist(ang, 0.0);
+                float angDistLeft  = AngleDist(ang, PI);
+
+                // turn angular distance into [0..1] local coordinate
+                float vRight = angDistRight / _ArrowAngleWidth;
+                float vLeft  = angDistLeft  / _ArrowAngleWidth;
+
+                // step(a, b): returns 0 if b < a; returns 1 if b >= a
+                float inRadial = step(0.0, u) * step(u, 1.0); // only 1 when 0 <= u <= 1
+
+
+                // Triangle profile: at u=0 (base), allow v up to around 1; at u=1 (tip), v must be 0
+                // So "inside triangle" if v <= (1-u)
+                float triangleRight = step(vRight, 1.0 - u) * inRadial;
+                float triangleLeft  = step(vLeft,  1.0 - u) * inRadial;
+
+                float arrows = (triangleRight + triangleLeft) ;
+                
+                col.rgb += (arrows * _ShowArrows) * _ArrowStrength;
 
                 return col;
             }
