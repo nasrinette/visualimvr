@@ -1163,7 +1163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7831cb475352dd4cac8d8a2a0263425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aButtonAction: {fileID: -3599823989380923159, guid: 0be0028c24f2a4c14a96b6aa39055933, type: 3}
+  aButtonAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   rayInteractor: {fileID: 2083409961}
   dialogueClips:
   - {fileID: 8300000, guid: 21d08e8d80519784985f523e9856d6d4, type: 3}
@@ -15881,11 +15881,11 @@ Transform:
   m_GameObject: {fileID: 960266072}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.281, y: 1.353, z: 3.5391}
+  m_LocalPosition: {x: 0.019000053, y: 1.179, z: 0.029099941}
   m_LocalScale: {x: 1.24929, y: 0.00863, z: 2.38898}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 54238043}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &967567311
 GameObject:
@@ -22631,7 +22631,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   supermarket: {fileID: 140526027}
   street: {fileID: 2073153586}
-  classroom: {fileID: 0}
+  classroom: {fileID: 1341078357}
   supermarketFrame: {fileID: 54238042}
   streetFrame: {fileID: 838236602}
   classroomFrame: {fileID: 503161422}
@@ -22774,7 +22774,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1341078358
 Transform:
   m_ObjectHideFlags: 0
@@ -42224,6 +42224,9 @@ PrefabInstance:
     - {fileID: 3060938097606850159, guid: 0e33a79c98b06471299b48fd4404e2dc, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6159111938811668493, guid: 0e33a79c98b06471299b48fd4404e2dc, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 960266076}
+    - targetCorrespondingSourceObject: {fileID: 6159111938811668493, guid: 0e33a79c98b06471299b48fd4404e2dc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1125468365}
     m_AddedComponents: []
@@ -44043,7 +44046,6 @@ SceneRoots:
   - {fileID: 940110916}
   - {fileID: 2024249477}
   - {fileID: 2024082212958589230}
-  - {fileID: 960266076}
   - {fileID: 2073153587}
   - {fileID: 1341078358}
   - {fileID: 140526028}
