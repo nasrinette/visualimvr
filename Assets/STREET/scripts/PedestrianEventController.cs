@@ -21,6 +21,7 @@ public class PedestrianEventController : MonoBehaviour
     public float stopDuration = 0.8f;
     public float approachDurationMax = 6f; // safety so it doesn't loop forever
 
+    public TunnelVisionInput tunnelVisionInput;
 
     public void StartWaitForGreenMoment()
     {
@@ -65,11 +66,12 @@ public class PedestrianEventController : MonoBehaviour
             yield return null;
         }
 
-        ped.StopMoving(); 
+        ped.StopMoving();
 
         source = newPedestrian.GetComponent<AudioSource>();
 
         // this is to be sure we wait until the pedestrian is close to user to fire the sounds
+
         if (source && hitSound)
         {
             source.clip = hitSound;
@@ -81,10 +83,15 @@ public class PedestrianEventController : MonoBehaviour
             source.clip = pedestrianTalking;
             source.Play();
         }
+        if (tunnelVisionInput != null)
+        {
+            tunnelVisionInput.ReduceBaseRadius(0.05f);
+
+        }
 
         yield return new WaitForSeconds(stopDuration);
 
-        ped.ResumeMoving(); 
+        ped.ResumeMoving();
         if (exitTarget != null)
             ped.GoToPosition(exitTarget.position);
 

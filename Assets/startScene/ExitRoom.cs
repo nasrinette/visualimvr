@@ -14,11 +14,10 @@ public class ExitRoom : MonoBehaviour
 
     public GameObject baseRoom;
 
-    public AudioSource supermarketBackgroundSound;
-    public AudioSource streetBackgroundSound;
-    public AudioSource classroomBackgroundSound;
-
     public TunnelVisionController tunnelController;
+
+    public AudioSource audioSource;
+
 
     [Tooltip("Seconds to ignore triggers after room activates (prevents instant exit on entry)")]
     public float entryCooldown = 1f;
@@ -47,9 +46,14 @@ public class ExitRoom : MonoBehaviour
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
 
-            if (streetBackgroundSound != null)
-                streetBackgroundSound.enabled = false;
-            tunnelController.SetTunnelActive(false);
+            if (audioSource != null)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+
+            }
+
+            if (tunnelController !=null) tunnelController.SetTunnelActive(false);
         }
     }
 }

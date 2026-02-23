@@ -31,7 +31,7 @@ Material:
     - _Radius: 0.18
     - _Snap: 0
     - _Strain: 0
-    - _WarpStrength: 0.02
+    - _WarpStrength: 0.0002
     m_Colors:
     - _CenterUV: {r: 0.5, g: 0.5, b: 0, a: 0}
   m_BuildTextureStacks: []

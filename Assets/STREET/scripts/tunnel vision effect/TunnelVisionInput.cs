@@ -53,7 +53,7 @@ public class TunnelVisionInput : MonoBehaviour
         currentRadius = baseRadius;
     }
 
-     void Start()
+    void Start()
     {
         // If the Inspector-configured actions have no bindings, create runtime actions
         if (!HasBindings(leftGrip))
@@ -101,7 +101,8 @@ public class TunnelVisionInput : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.P)) {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
             Debug.Log("P pressed");
             scenario.OnTunnelExpandAttempted();
         }
@@ -112,7 +113,7 @@ public class TunnelVisionInput : MonoBehaviour
         var rightAction = GetRightGripAction();
 
         bool leftHeld = leftAction != null && leftAction.IsPressed();
-         if (leftHeld) Debug.Log("pressed on left");
+        if (leftHeld) Debug.Log("pressed on left");
 
         bool rightHeld = rightAction != null && rightAction.IsPressed();
         if (rightHeld) Debug.Log("pressed on right");
@@ -192,6 +193,13 @@ public class TunnelVisionInput : MonoBehaviour
 
     }
 
+    public void ReduceBaseRadius(float amount)
+    {
+        baseRadius = Mathf.Max(0f, baseRadius - amount);
+        // currentRadius = Mathf.Min(currentRadius, baseRadius);
+
+        Debug.Log($"[TUNNEL] baseRadius reduced -> {baseRadius}");
+    }
     void OnDestroy()
     {
         runtimeLeftGrip?.Disable();
