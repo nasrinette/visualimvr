@@ -57,6 +57,7 @@ public class CataractController : MonoBehaviour
     public float transitionSpeed = 2f;
 
     private Material cataractMaterial;
+    private CataractRendererFeature cataractFeature;
     private Bloom bloom;
     private float originalBloomIntensity;
     private float originalBloomThreshold;
@@ -74,7 +75,9 @@ public class CataractController : MonoBehaviour
             {
                 if (feature is CataractRendererFeature cf)
                 {
+                    cataractFeature = cf;
                     cataractMaterial = cf.GetMaterial();
+                    cf.SetActive(true);
                     break;
                 }
             }
@@ -184,6 +187,20 @@ public class CataractController : MonoBehaviour
 
     void OnDisable()
     {
+        // Stop the renderer feature from blitting outside the classroom
+        if (cataractFeature != null)
+            cataractFeature.SetActive(false);
+
+        // Reset shader params so they don't linger if re-enabled unexpectedly
+        if (cataractMaterial != null)
+        {
+            cataractMaterial.SetFloat("_BlurRadius", 0f);
+            cataractMaterial.SetFloat("_ScatterStrength", 0f);
+            cataractMaterial.SetFloat("_ContrastLoss", 0f);
+            cataractMaterial.SetFloat("_YellowTint", 0f);
+            cataractMaterial.SetFloat("_VeilingGlare", 0f);
+        }
+
         // Restore original Bloom values so edits don't persist on shared profile
         if (bloom != null && hadBloom)
         {

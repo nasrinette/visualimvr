@@ -8,6 +8,7 @@ public class CataractRendererFeature : ScriptableRendererFeature
 
     private Material material;
     private CataractRenderPass pass;
+    private bool effectActive;
 
     public override void Create()
     {
@@ -28,7 +29,7 @@ public class CataractRendererFeature : ScriptableRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (material == null || pass == null) return;
+        if (!effectActive || material == null || pass == null) return;
         renderer.EnqueuePass(pass);
     }
 
@@ -39,6 +40,7 @@ public class CataractRendererFeature : ScriptableRendererFeature
             CoreUtils.Destroy(material);
     }
 
+    public void SetActive(bool active) => effectActive = active;
     public Material GetMaterial() => material;
     public CataractSettings GetSettings() => settings;
 }

@@ -56,6 +56,10 @@ public class RoomDarknessController : MonoBehaviour
     private Light[] overheadLights;
     private float[] originalLightIntensities;
 
+    // Original global state for cleanup
+    private float originalAmbientIntensity;
+    private float originalPostExposure;
+
     void Start()
     {
         if (curtains == null || curtains.Length == 0)
@@ -98,6 +102,9 @@ public class RoomDarknessController : MonoBehaviour
             }
         }
 
+        // Save original global state for cleanup
+        originalAmbientIntensity = RenderSettings.ambientIntensity;
+
         // Find ColorAdjustments from the global volume
         var volumes = FindObjectsOfType<Volume>();
         foreach (var vol in volumes)
@@ -109,11 +116,43 @@ public class RoomDarknessController : MonoBehaviour
             }
         }
 
+        if (colorAdjustments != null)
+            originalPostExposure = colorAdjustments.postExposure.value;
+
         // Initialize to current state (no pop on first frame)
         float curtainsClosed = CalculateCurtainsClosed();
         float lightsOn = CalculateLightsOnFraction();
         CalculateLightingTargets(curtainsClosed, lightsOn, out currentExposure, out currentAmbient);
         currentLightMultiplier = 1f + (indoorLightBoost - 1f) * curtainsClosed;
+    }
+
+    void OnDisable()
+    {
+        // Restore global render settings
+        RenderSettings.ambientIntensity = originalAmbientIntensity;
+
+        if (colorAdjustments != null)
+            colorAdjustments.postExposure.Override(originalPostExposure);
+
+        // Restore overhead light intensities
+        if (overheadLights != null && originalLightIntensities != null)
+        {
+            for (int i = 0; i < overheadLights.Length; i++)
+            {
+                if (overheadLights[i] != null)
+                    overheadLights[i].intensity = originalLightIntensities[i];
+            }
+        }
+
+        // Restore whiteboard text colors
+        if (whiteboardTexts != null && originalTextColors != null)
+        {
+            for (int i = 0; i < whiteboardTexts.Length; i++)
+            {
+                if (whiteboardTexts[i] != null)
+                    whiteboardTexts[i].color = originalTextColors[i];
+            }
+        }
     }
 
     void Update()
