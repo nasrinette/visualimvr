@@ -112,7 +112,7 @@ public class EnterRoom : MonoBehaviour
                     uiManager.ShowScenarioInfo("Supermarket");
                     // This will update to show "Mission: Bring a ripe tomato" etc.
                 }
-                tunnelController.SetTunnelActive(false);
+                if (tunnelController!=null) tunnelController.SetTunnelActive(false);
             }
 
             // STREET: Can only enter if supermarket tasks are NOT complete yet
@@ -152,7 +152,7 @@ public class EnterRoom : MonoBehaviour
                     uiManager.ShowScenarioInfo("Street");
                 }
 
-                tunnelController.SetTunnelActive(true);
+                if (tunnelController!=null) tunnelController.SetTunnelActive(true);
             }
 
             // CLASSROOM: Can only enter if supermarket tasks are NOT complete yet
