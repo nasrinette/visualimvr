@@ -1166,7 +1166,7 @@ MonoBehaviour:
   aButtonAction: {fileID: -3599823989380923159, guid: 0be0028c24f2a4c14a96b6aa39055933, type: 3}
   rayInteractor: {fileID: 2083409961}
   dialogueClips:
-  - {fileID: 8300000, guid: 592813882bdec0a4ba2edf23bd08ed46, type: 3}
+  - {fileID: 8300000, guid: 21d08e8d80519784985f523e9856d6d4, type: 3}
 --- !u!114 &62283505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18136,8 +18136,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorblindType: 5
-  dialogueClip: {fileID: 8300000, guid: fde95438c44d10d488ddebed7740ff58, type: 3}
-  alreadyWearingGlassesClip: {fileID: 0}
+  dialogueClip: {fileID: 8300000, guid: 86bc32331873f784b84dee8c159f13c7, type: 3}
+  alreadyWearingGlassesClip: {fileID: 8300000, guid: 7db4910933158294bb0dfe1601acb562, type: 3}
   hideOnGrab: 1
 --- !u!65 &1100349578
 BoxCollider:
@@ -18253,6 +18253,8 @@ MonoBehaviour:
   wrongGrapesDialogue: {fileID: 8300000, guid: 7db4910933158294bb0dfe1601acb562, type: 3}
   wrongItemDialogue: {fileID: 0}
   noMissionDialogue: {fileID: 0}
+  allMissionsCompleteDialogue: {fileID: 8300000, guid: 2f0ff365e4e4a8b4b822fef75bb97aee, type: 3}
+  completionDialogueDelay: 1
   uiManager: {fileID: 645403882}
 --- !u!4 &1107223456
 Transform:
@@ -23271,8 +23273,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colorblindType: 3
-  dialogueClip: {fileID: 8300000, guid: 0688ac6afa28e374a88f7b97557703f5, type: 3}
-  alreadyWearingGlassesClip: {fileID: 0}
+  dialogueClip: {fileID: 8300000, guid: 812d1a0543ef4ab48818de85438390a7, type: 3}
+  alreadyWearingGlassesClip: {fileID: 8300000, guid: d7eabbc15eaf23a4a8e15e599830d1d1, type: 3}
   hideOnGrab: 1
 --- !u!65 &1367513447
 BoxCollider:
@@ -24709,7 +24711,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorblindType: 1
   dialogueClip: {fileID: 8300000, guid: 10e4f66ac2169594aba397da8ce391ea, type: 3}
-  alreadyWearingGlassesClip: {fileID: 0}
+  alreadyWearingGlassesClip: {fileID: 8300000, guid: 4a6786f1d7a56a1429d83058b55950ce, type: 3}
   hideOnGrab: 1
 --- !u!65 &1458473128
 BoxCollider:

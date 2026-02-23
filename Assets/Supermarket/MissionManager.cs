@@ -1,5 +1,6 @@
 using UnityEngine;
 using SOHNE.Accessibility.Colorblindness;
+using System.Collections;
 
 public class MissionManager : MonoBehaviour
 {
@@ -15,7 +16,6 @@ public class MissionManager : MonoBehaviour
     [Header("Current State")]
     [SerializeField] private MissionPhase currentPhase = MissionPhase.Introduction;
 
-    // Track each mission independently
     private bool tomatoComplete = false;
     private bool pepperComplete = false;
     private bool grapesComplete = false;
@@ -39,6 +39,10 @@ public class MissionManager : MonoBehaviour
     [Header("Error Dialogues")]
     [SerializeField] private AudioClip wrongItemDialogue;
     [SerializeField] private AudioClip noMissionDialogue;
+
+    [Header("Completion Dialogue")]
+    [SerializeField] private AudioClip allMissionsCompleteDialogue;
+    [SerializeField] private float completionDialogueDelay = 1.5f; // Pause after last reveal
 
     private SupermarketItem.ItemType currentObjective;
     private bool hasMissionActive = false;
@@ -142,28 +146,30 @@ public class MissionManager : MonoBehaviour
         Debug.Log("✓✓✓ CORRECT ITEM DELIVERED! Proceeding with reveal...");
         hasMissionActive = false;
 
-        // Reveal table item and mark mission complete
+        AudioClip revealClip = null;
+
         switch (item.itemType)
         {
             case SupermarketItem.ItemType.Tomato:
                 if (tableTomato != null) tableTomato.SetActive(true);
                 tomatoComplete = true;
-                ShowReveal(wrongTomatoDialogue);
+                revealClip = wrongTomatoDialogue;
                 break;
             case SupermarketItem.ItemType.BellPepper:
                 if (tableBellPepper != null) tableBellPepper.SetActive(true);
                 pepperComplete = true;
-                ShowReveal(wrongPepperDialogue);
+                revealClip = wrongPepperDialogue;
                 break;
             case SupermarketItem.ItemType.Grapes:
                 if (tableGrapes != null) tableGrapes.SetActive(true);
                 grapesComplete = true;
-                ShowReveal(wrongGrapesDialogue);
+                revealClip = wrongGrapesDialogue;
                 break;
         }
 
+        ShowReveal(revealClip);
         RemoveColorBlindness();
-        CheckAllMissionsComplete();
+        CheckAllMissionsComplete(revealClip);
     }
 
     void RemoveColorBlindness()
@@ -186,7 +192,7 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-    void CheckAllMissionsComplete()
+    void CheckAllMissionsComplete(AudioClip lastRevealClip)
     {
         if (tomatoComplete && pepperComplete && grapesComplete)
         {
@@ -195,15 +201,30 @@ public class MissionManager : MonoBehaviour
             Debug.Log("All missions complete! ✓");
             if (uiManager != null)
                 uiManager.UpdateMissionText();
+
+            // Wait for the reveal clip to finish, then play completion dialogue
+            float revealDuration = lastRevealClip != null ? lastRevealClip.length : 0f;
+            StartCoroutine(PlayCompletionDialogue(revealDuration + completionDialogueDelay));
+
             EnterRoom enterRoom = FindObjectOfType<EnterRoom>();
             if (enterRoom != null)
                 enterRoom.RefreshDoorBlockers();
         }
         else
         {
-            currentPhase = MissionPhase.Introduction; // Back to idle, waiting for next glasses
+            currentPhase = MissionPhase.Introduction;
             if (uiManager != null)
                 uiManager.UpdateMissionText();
+        }
+    }
+
+    private IEnumerator PlayCompletionDialogue(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (guideCharacter != null && allMissionsCompleteDialogue != null)
+        {
+            Debug.Log("*** PLAYING COMPLETION DIALOGUE ***");
+            guideCharacter.PlayDialogue(allMissionsCompleteDialogue);
         }
     }
 }
