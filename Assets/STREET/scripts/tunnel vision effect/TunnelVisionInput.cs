@@ -150,7 +150,8 @@ public class TunnelVisionInput : MonoBehaviour
         {
             if (!wasTrying)
             {
-                scenario.OnTunnelExpandAttempted();
+                // scenario.OnTunnelExpandAttempted();
+                scenario.RequestTunnelExpandAttempt();
 
             }
 

@@ -33,6 +33,8 @@ public class ScenarioNarration : MonoBehaviour
     public Phase CurrentPhase { get; private set; } = Phase.Intro;
     bool narrationPlaying;
 
+    bool pendingExpandAttempt;
+
     public void OnEnteredScene()
     {
         StartCoroutine(IntroSequence());
@@ -48,6 +50,12 @@ public class ScenarioNarration : MonoBehaviour
 
         CurrentPhase = Phase.TryExpandTunnel;
         Debug.Log("[NAV] Try to force your vision wider. Stretch your awareness. See if you can see more of the street.");
+        if (pendingExpandAttempt)
+        {
+            pendingExpandAttempt = false;
+            OnTunnelExpandAttempted();
+            yield break; // optional: stop the tryExpandClip if you want
+        }
 
         yield return StartCoroutine(PlaySound(tryExpandClip));
     }
@@ -57,16 +65,33 @@ public class ScenarioNarration : MonoBehaviour
     {
         if (CurrentPhase != Phase.TryExpandTunnel) return;
         Debug.Log("[NAV] Tunnel vision doesn't expand smoothly. You can't just try harder to see more with this impairment.");
+        CurrentPhase = Phase.FindCrosswalkButton;
         StartCoroutine(TryExpandSequence());
 
-        CurrentPhase = Phase.FindCrosswalkButton;
+
+    }
+
+    public void RequestTunnelExpandAttempt()
+    {
+        // If we're already in the right phase, handle immediately
+        if (CurrentPhase == Phase.TryExpandTunnel)
+        {
+            OnTunnelExpandAttempted();
+            return;
+        }
+        if (CurrentPhase == Phase.Intro)
+        {
+            // Otherwise, remember it happened
+            pendingExpandAttempt = true;
+            Debug.Log("[NAV] Expand attempt queued (waiting for TryExpandTunnel phase).");
+        }
     }
 
     IEnumerator TryExpandSequence()
     {
         yield return StartCoroutine(PlaySound(afterTryExpandClip));
 
-        yield return new WaitForSeconds(2f);  
+        yield return new WaitForSeconds(2f);
         Debug.Log("[NAV] Cross the street when you think it's safe. First, request the crossing.");
 
         yield return StartCoroutine(PlaySound(findButtonClip));
