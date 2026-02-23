@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class EnterRoom : MonoBehaviour
 {
@@ -32,10 +33,20 @@ public class EnterRoom : MonoBehaviour
     public Collider streetBlocker;
     [Tooltip("Solid collider that blocks classroom door when inactive")]
     public Collider classroomBlocker;
+    [Header("Skybox")]
+    [Tooltip("Custom skybox material for the classroom. Leave empty to keep the default.")]
+    public Material classroomSkybox;
+    [Tooltip("Ambient light color for the classroom (removes blue tint from base skybox)")]
+    public Color classroomAmbientColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+
     [Header("UI")]
     public ScenarioUIManager uiManager;
 
     private MissionManager missionManager;
+    private Material baseSkybox;
+    private AmbientMode baseAmbientMode;
+    private Color baseAmbientColor;
+    private DefaultReflectionMode baseReflectionMode;
     public AudioSource blockedEntrySound;
 
     void Start()
@@ -45,6 +56,10 @@ public class EnterRoom : MonoBehaviour
         classroom.SetActive(false);
         baseRoom.SetActive(true);
 
+        baseSkybox = RenderSettings.skybox;
+        baseAmbientMode = RenderSettings.ambientMode;
+        baseAmbientColor = RenderSettings.ambientLight;
+        baseReflectionMode = RenderSettings.defaultReflectionMode;
         missionManager = FindObjectOfType<MissionManager>();
         if (missionManager == null)
         {
@@ -106,6 +121,8 @@ public class EnterRoom : MonoBehaviour
                 streetFrame.SetActive(false);
                 classroomFrame.SetActive(false);
 
+                RestoreBaseEnvironment();
+
                 // NEW: Update UI to show the specific mission item
                 if (uiManager != null)
                 {
@@ -134,6 +151,8 @@ public class EnterRoom : MonoBehaviour
                 baseRoom.SetActive(false);
                 supermarketFrame.SetActive(false);
                 classroomFrame.SetActive(false);
+
+                RestoreBaseEnvironment();
 
                 if (audioSource != null && streetBackgroundSound != null)
                 {
@@ -175,6 +194,15 @@ public class EnterRoom : MonoBehaviour
                 supermarketFrame.SetActive(false);
                 streetFrame.SetActive(false);
 
+                if (classroomSkybox != null)
+                {
+                    RenderSettings.skybox = classroomSkybox;
+                    RenderSettings.ambientMode = AmbientMode.Flat;
+                    RenderSettings.ambientLight = classroomAmbientColor;
+                    RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
+                    DynamicGI.UpdateEnvironment();
+                }
+
                 // NEW: Show scenario UI
                 if (uiManager != null)
                 {
@@ -183,6 +211,15 @@ public class EnterRoom : MonoBehaviour
                 if (tunnelController!=null) tunnelController.SetTunnelActive(false);
             }
         }
+    }
+
+    void RestoreBaseEnvironment()
+    {
+        RenderSettings.skybox = baseSkybox;
+        RenderSettings.ambientMode = baseAmbientMode;
+        RenderSettings.ambientLight = baseAmbientColor;
+        RenderSettings.defaultReflectionMode = baseReflectionMode;
+        DynamicGI.UpdateEnvironment();
     }
 
     // NEW: Call this from GlassesInteractable or MissionManager when state changes
