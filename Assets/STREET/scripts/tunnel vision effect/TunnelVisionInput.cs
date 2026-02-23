@@ -204,12 +204,12 @@ public class TunnelVisionInput : MonoBehaviour
 
         float showArrows = (inTryExpand && !trying) ? 1f : 0f;
 
-        float glow = 0f;
-        if (inTryExpand) glow = 0.25f;
+        // float glow = 0f;
+        // if (inTryExpand) glow = 0.25f;
         // if (gripsHeld) glow = 0.3f;
 
         tunnelMaterial.SetFloat("_ShowArrows", showArrows);
-        tunnelMaterial.SetFloat("_EdgeGlow", glow);
+        // tunnelMaterial.SetFloat("_EdgeGlow", glow);
     }
 
     public void ReduceBaseRadius(float amount)

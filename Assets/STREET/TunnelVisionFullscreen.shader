@@ -15,8 +15,8 @@ Shader "Hidden/TunnelVisionFullscreen"
         _Snap("Snap", Float) = 0
 
         // edge glow around (explanation)
-        _EdgeGlow ("Edge Glow", Range(0,1)) = 0
-        _GlowWidth ("Glow Width", Range(0,0.2)) = 0.02
+        // _EdgeGlow ("Edge Glow", Range(0,1)) = 0
+        // _GlowWidth ("Glow Width", Range(0,0.2)) = 0.02
         
         // arrows (explanation)
         _ShowArrows ("Show Arrows", Range(0,1)) = 0 // either yes or no
@@ -25,7 +25,7 @@ Shader "Hidden/TunnelVisionFullscreen"
         _ArrowLength ("Arrow Length", Range(0.01,0.3)) = 0.08
         _ArrowPulseAmp ("Arrow Pulse Amp", Range(0,0.05)) = 0.01
         _ArrowPulseSpeed ("Arrow Pulse Speed", Range(0,10)) = 3
-        _EdgeGlowColor ("Edge Glow Color", Color) = (1,0.8,0.2,1)
+        // _EdgeGlowColor ("Edge Glow Color", Color) = (1,0.8,0.2,1)
     }
 
     // contains shader code
@@ -58,10 +58,10 @@ Shader "Hidden/TunnelVisionFullscreen"
             float4 _CenterUV;
             float _WarpStrength, _EdgeWidth, _Strain, _Snap, _BlurStrength;
 
-            float _EdgeGlow, _GlowWidth;
+            // float _EdgeGlow, _GlowWidth;
             float _ShowArrows, _ArrowStrength, _ArrowAngleWidth, _ArrowLength;
             float _ArrowPulseAmp, _ArrowPulseSpeed;
-            float4 _EdgeGlowColor;
+            // float4 _EdgeGlowColor;
 
             // The structure definition defines which variables it contains.
             // This example uses the Attributes structure as an input structure in
@@ -155,8 +155,8 @@ Shader "Hidden/TunnelVisionFullscreen"
               
 
                 // edgeBand = 1 near dist==r, 0 away
-                float edgeBand = 1.0 - smoothstep(0.0, _GlowWidth, abs(d - _Radius));
-                col.rgb += edgeBand * _EdgeGlow * _EdgeGlowColor.rgb;
+                // float edgeBand = 1.0 - smoothstep(0.0, _GlowWidth, abs(d - _Radius));
+                // col.rgb += edgeBand * _EdgeGlow * _EdgeGlowColor.rgb;
 
 
 
