@@ -48,7 +48,7 @@ public class CarHonkManager : MonoBehaviour
         busy = false;
          if (tunnelVisionInput != null)
         {
-            tunnelVisionInput.ReduceBaseRadius(0.05f);
+            tunnelVisionInput.ReduceBaseRadius(0.02f);
 
         }
     }

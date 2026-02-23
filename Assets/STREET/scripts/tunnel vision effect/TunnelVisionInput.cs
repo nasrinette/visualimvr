@@ -22,7 +22,7 @@ public class TunnelVisionInput : MonoBehaviour
     public float maxDist = 0.60f;
 
     [Header("Tunnel")]
-    public float baseRadius = 0.18f;
+    public float baseRadius = 0.15f;
     public float maxExtraRadius = 0.08f;
     public float expandSpeed = 12f;
     public float snapSpeed = 18f;
@@ -206,7 +206,7 @@ public class TunnelVisionInput : MonoBehaviour
 
         float glow = 0f;
         if (inTryExpand) glow = 0.25f;
-        if (gripsHeld) glow = 0.3f;
+        // if (gripsHeld) glow = 0.3f;
 
         tunnelMaterial.SetFloat("_ShowArrows", showArrows);
         tunnelMaterial.SetFloat("_EdgeGlow", glow);
