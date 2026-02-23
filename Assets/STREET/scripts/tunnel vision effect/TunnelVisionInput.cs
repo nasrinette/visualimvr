@@ -47,6 +47,7 @@ public class TunnelVisionInput : MonoBehaviour
 
     InputAction runtimeLeftGrip;
     InputAction runtimeRightGrip;
+    bool wasTrying;
 
     void Awake()
     {
@@ -147,7 +148,14 @@ public class TunnelVisionInput : MonoBehaviour
 
         if (trying)
         {
-            scenario.OnTunnelExpandAttempted();
+            if (!wasTrying)
+            {
+                scenario.OnTunnelExpandAttempted();
+
+            }
+
+            wasTrying = trying;
+            // scenario.OnTunnelExpandAttempted();
             // float dist = Vector3.Distance(leftController.position, rightController.position);
             // float stretch = Mathf.InverseLerp(minDist, maxDist, dist);
             // stretch = Mathf.Clamp01(stretch);
@@ -190,7 +198,18 @@ public class TunnelVisionInput : MonoBehaviour
         tunnelMaterial.SetFloat("_Strain", strain);
         tunnelMaterial.SetFloat("_Snap", snap);
 
+        // when we are in the try expand audio (explanation), we make the help arrows appear
+        // otherwise they disappear
+        bool inTryExpand = scenario != null && scenario.CurrentPhase == ScenarioNarration.Phase.TryExpandTunnel;
 
+        float showArrows = (inTryExpand && !trying) ? 1f : 0f;
+
+        float glow = 0f;
+        if (inTryExpand) glow = 0.25f;
+        if (gripsHeld) glow = 0.3f;
+
+        tunnelMaterial.SetFloat("_ShowArrows", showArrows);
+        tunnelMaterial.SetFloat("_EdgeGlow", glow);
     }
 
     public void ReduceBaseRadius(float amount)
