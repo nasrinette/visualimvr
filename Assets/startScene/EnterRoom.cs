@@ -172,7 +172,7 @@ public class EnterRoom : MonoBehaviour
 
                 if (audioSource != null && streetBackgroundSound != null)
                 {
-                    audioSource.loop = false;
+                    audioSource.loop = true;
                     audioSource.clip = streetBackgroundSound;
                     audioSource.Play();
                 }

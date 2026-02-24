@@ -214,7 +214,7 @@ public class TunnelVisionInput : MonoBehaviour
 
     public void ReduceBaseRadius(float amount)
     {
-        baseRadius = Mathf.Max(0f, baseRadius - amount);
+        baseRadius = Mathf.Max(0.1f, baseRadius - amount);
         // currentRadius = Mathf.Min(currentRadius, baseRadius);
 
         Debug.Log($"[TUNNEL] baseRadius reduced -> {baseRadius}");

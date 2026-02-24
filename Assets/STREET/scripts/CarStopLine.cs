@@ -22,6 +22,8 @@ public class CarStopLine : MonoBehaviour
 
     public float fallbackSpeed = 10f;
 
+    public bool inverseSide;
+
     void OnTriggerEnter(Collider other)
     {
         var cart = other.GetComponentInParent<CinemachineDollyCart>();
@@ -33,10 +35,28 @@ public class CarStopLine : MonoBehaviour
         // }
 
     }
+
+    bool HasPassedLine(Transform carT)
+    {
+        // If car is in front of the stop line plane, it has passed.
+        // + means in front (same direction as stop line forward)
+        Vector3 fwd = transform.forward;
+        Vector3 toCar = carT.position - transform.position;
+        return Vector3.Dot(fwd, toCar) > 0f;
+    }
+
     void OnTriggerStay(Collider other)
     {
         var cart = other.GetComponentInParent<CinemachineDollyCart>();
         if (cart == null || signal == null) return;
+
+        if (isFrontStopLine && HasPassedLine(cart.transform))
+        {
+            Release(cart);
+            if (currentCar == cart) currentCar = null;
+            return;
+        }
+
 
         if (!signal.ShouldCarsStop) // if it red for pedestrians
         {

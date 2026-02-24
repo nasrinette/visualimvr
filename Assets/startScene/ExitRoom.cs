@@ -72,7 +72,7 @@ public EnvironmentState envState;
             {
                 audioSource.Stop();
                 audioSource.clip = null;
-
+                audioSource.loop = false;
             }
 
             if (tunnelController !=null) tunnelController.SetTunnelActive(false);

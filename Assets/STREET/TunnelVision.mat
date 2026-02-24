@@ -36,7 +36,7 @@ Material:
     - _EdgeWidth2: 0.02
     - _Feather: 0.24
     - _GlowWidth: 0.013
-    - _Radius: 0.14000002
+    - _Radius: 0.1
     - _ShowArrows: 1
     - _Snap: 0
     - _Strain: 0
