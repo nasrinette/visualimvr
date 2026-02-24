@@ -8,26 +8,19 @@ public class TunnelVisionInput : MonoBehaviour
     public Transform leftController;
     public Transform rightController;
 
-    [Header("Input Actions (XRI default)")]
+    [Header("Input Actions")]
     public InputActionProperty leftGrip;
     public InputActionProperty rightGrip;
 
-    [Header("Material to drive")]
+    [Header("Material")]
     public Material tunnelMaterial;
 
-    [Header("Gesture")]
-    public float gripThreshold = 0.4f;
-    public float minDist = 0.20f;
-    public float maxDist = 0.60f;
 
     [Header("Tunnel")]
     public float baseRadius = 0.15f;
     public float maxExtraRadius = 0.08f;
     public float expandSpeed = 12f;
-    public float snapSpeed = 18f;
 
-    [Header("Fallback (Keyboard)")]
-    public KeyCode debugKey = KeyCode.E;
 
     float snapTime = 0.03f;
     float currentRadius;
@@ -100,7 +93,7 @@ public class TunnelVisionInput : MonoBehaviour
     }
     void Update()
     {
-
+        // for debuging
         if (Input.GetKeyDown(KeyCode.P))
         {
             Debug.Log("P pressed");
@@ -109,21 +102,19 @@ public class TunnelVisionInput : MonoBehaviour
 
         if (!tunnelMaterial || !leftController || !rightController) return;
 
+        // we need left and right back buttons pressed
         var leftAction = GetLeftGripAction();
         var rightAction = GetRightGripAction();
 
         bool leftHeld = leftAction != null && leftAction.IsPressed();
-        // if (leftHeld) Debug.Log("pressed on left");
 
         bool rightHeld = rightAction != null && rightAction.IsPressed();
-        // if (rightHeld) Debug.Log("pressed on right");
 
         bool gripsHeld = leftHeld && rightHeld;
-        // if (gripsHeld) Debug.Log("pressed on both");
 
-
+        // Measure how far the hands moved apart since the grips were first pressed
         float currentDist = Vector3.Distance(leftController.position, rightController.position);
-        // Debug.Log("current dist: "+currentDist);
+
         if (gripsHeld && !wasGripsHeld)
         {
             grabStartDist = currentDist;
@@ -134,12 +125,13 @@ public class TunnelVisionInput : MonoBehaviour
 
         if (gripsHeld)
         {
+            // we use the grabStartDist and currentDist to impact how much it will stretch
             float delta = currentDist - grabStartDist;
             stretch = Mathf.InverseLerp(0f, maxStretchAmount, delta);
             stretch = Mathf.Clamp01(stretch);
         }
 
-        // "Trying" means: grips held AND actually stretched a bit
+        // trying= grips held AND actually stretched a bit
         bool trying = gripsHeld && stretch > 0.02f;
 
         float targetRadius = baseRadius;
@@ -147,44 +139,43 @@ public class TunnelVisionInput : MonoBehaviour
 
         if (trying)
         {
+            // this fire the scenario event once when the user starts trying
             if (!wasTrying)
             {
-                // scenario.OnTunnelExpandAttempted();
                 scenario.RequestTunnelExpandAttempt();
 
             }
 
             wasTrying = trying;
-            // scenario.OnTunnelExpandAttempted();
-            // float dist = Vector3.Distance(leftController.position, rightController.position);
-            // float stretch = Mathf.InverseLerp(minDist, maxDist, dist);
-            // stretch = Mathf.Clamp01(stretch);
-            // stretch = 1f; // for now User is stretching at full strength.
-
-            // Resistance (diminishing returns)
+           
+            // resistance : harder to expand the more you pull
             float resisted = 1f - Mathf.Exp(-3f * stretch); // makes expansion harder the more you push; we use exp to do so
 
             targetRadius = baseRadius + maxExtraRadius * resisted;
 
-            // moves from currentRadius to targetRadius with t =. 1- ..
+            // smooth expand towards the target: moves from currentRadius to targetRadius with t = 1- ..
             currentRadius = Mathf.Lerp(currentRadius, targetRadius, 1f - Mathf.Exp(-expandSpeed * Time.deltaTime));
             radiusVel = 0f;
+
+
             strain = Mathf.Lerp(strain, 1f, 1f - Mathf.Exp(-10f * Time.deltaTime));
         }
         else
         {
-            // does the same as when trying but "inverse" (from current to base radius) and with snapSpeed > expandSpeed
-            // currentRadius = Mathf.Lerp(currentRadius, baseRadius, 1f - Mathf.Exp(-snapSpeed * Time.deltaTime));
+            // snaps back smoothly to base radius
+            // does the same as when trying but "inverse" (from current to base radius) 
             currentRadius = Mathf.SmoothDamp(currentRadius, baseRadius, ref radiusVel, snapTime);
             strain = Mathf.Lerp(strain, 0f, 1f - Mathf.Exp(-18f * Time.deltaTime));
         }
 
+        // apply those parameters to the shader
         tunnelMaterial.SetFloat("_Radius", currentRadius);
         tunnelMaterial.SetFloat("_Feather", 0.24f);
         tunnelMaterial.SetFloat("_Darkness", 1.0f);
         tunnelMaterial.SetVector("_CenterUV", new Vector4(0.5f, 0.5f, 0, 0));
         tunnelMaterial.SetFloat("_BlurStrength", 1.0f);
 
+        // snap when buttons are released
         if (wasGripsHeld && !gripsHeld)
             snap = 1f;
 
@@ -193,7 +184,6 @@ public class TunnelVisionInput : MonoBehaviour
 
         wasGripsHeld = gripsHeld;
         previousDist = currentDist;
-
 
         tunnelMaterial.SetFloat("_Strain", strain);
         tunnelMaterial.SetFloat("_Snap", snap);
@@ -204,19 +194,12 @@ public class TunnelVisionInput : MonoBehaviour
 
         float showArrows = (inTryExpand && !trying) ? 1f : 0f;
 
-        // float glow = 0f;
-        // if (inTryExpand) glow = 0.25f;
-        // if (gripsHeld) glow = 0.3f;
-
         tunnelMaterial.SetFloat("_ShowArrows", showArrows);
-        // tunnelMaterial.SetFloat("_EdgeGlow", glow);
     }
 
     public void ReduceBaseRadius(float amount)
     {
         baseRadius = Mathf.Max(0.1f, baseRadius - amount);
-        // currentRadius = Mathf.Min(currentRadius, baseRadius);
-
         Debug.Log($"[TUNNEL] baseRadius reduced -> {baseRadius}");
     }
     void OnDestroy()

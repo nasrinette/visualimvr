@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class ScenarioNarration : MonoBehaviour
 {
+    // this class handles the narration and scenario
+    // handles the different steps/events and guiding sounds
     public enum Phase
     {
         Intro, // phase 1
-        TryExpandTunnel, // phae 2
+        TryExpandTunnel, // phase 2
         SensoryOverload,
         FindCrosswalkButton,
         WaitForGreen,
@@ -20,10 +22,7 @@ public class ScenarioNarration : MonoBehaviour
     public AudioClip introClip;
     public AudioClip tryExpandClip;
     public AudioClip afterTryExpandClip;
-    // public AudioClip overloadClip;
     public AudioClip findButtonClip;
-    public AudioClip goSafeClip;
-
     public AudioClip infoTunnelVisionClip;
     public AudioClip recapClip;
     public AudioClip exitDoorClip;
@@ -42,21 +41,22 @@ public class ScenarioNarration : MonoBehaviour
 
     IEnumerator IntroSequence()
     {
+        // AUDIO:  INTRO PART
         CurrentPhase = Phase.Intro;
-        Debug.Log("[NAV] Welcome. You're now seeing the world through the eyes of someone with peripheral loss/tunnel vision. Notice how the central sight remains clear, but everything around it fades away? Before moving, take a moment. How much of the street can you really see?");
+        // Debug.Log("[NAV] Welcome. You're now seeing the world through the eyes of someone with peripheral loss/tunnel vision. Notice how the central sight remains clear, but everything around it fades away? Before moving, take a moment. How much of the street can you really see?");
 
         yield return StartCoroutine(PlaySound(introClip));
         yield return new WaitForSeconds(4f);
 
         CurrentPhase = Phase.TryExpandTunnel;
-        Debug.Log("[NAV] Try to force your vision wider. Stretch your awareness. See if you can see more of the street.");
-        if (pendingExpandAttempt)
+        // Debug.Log("[NAV] Try to force your vision wider. Stretch your awareness. See if you can see more of the street.");
+        if (pendingExpandAttempt) 
         {
             pendingExpandAttempt = false;
             OnTunnelExpandAttempted();
-            yield break; // optional: stop the tryExpandClip if you want
+            yield break; 
         }
-
+        // AUDIO: TRY TO EXPAND
         yield return StartCoroutine(PlaySound(tryExpandClip));
     }
 
@@ -64,15 +64,15 @@ public class ScenarioNarration : MonoBehaviour
     public void OnTunnelExpandAttempted()
     {
         if (CurrentPhase != Phase.TryExpandTunnel) return;
-        Debug.Log("[NAV] Tunnel vision doesn't expand smoothly. You can't just try harder to see more with this impairment.");
+        // Debug.Log("[NAV] Tunnel vision doesn't expand smoothly. You can't just try harder to see more with this impairment.");
         CurrentPhase = Phase.FindCrosswalkButton;
         StartCoroutine(TryExpandSequence());
-
 
     }
 
     public void RequestTunnelExpandAttempt()
     {
+        // handles the case where user tries to extend they vision before they are prompted to do so, we just go to next step after the current audio is done
         // If we're already in the right phase, handle immediately
         if (CurrentPhase == Phase.TryExpandTunnel)
         {
@@ -83,16 +83,17 @@ public class ScenarioNarration : MonoBehaviour
         {
             // Otherwise, remember it happened
             pendingExpandAttempt = true;
-            Debug.Log("[NAV] Expand attempt queued (waiting for TryExpandTunnel phase).");
+            // Debug.Log("[NAV] Expand attempt queued (waiting for TryExpandTunnel phase).");
         }
     }
 
     IEnumerator TryExpandSequence()
     {
+        // AUDIO: REQUEST CROSSING 
         yield return StartCoroutine(PlaySound(afterTryExpandClip));
 
         yield return new WaitForSeconds(2f);
-        Debug.Log("[NAV] Cross the street when you think it's safe. First, request the crossing.");
+        // Debug.Log("[NAV] Cross the street when you think it's safe. First, request the crossing.");
 
         yield return StartCoroutine(PlaySound(findButtonClip));
         CurrentPhase = Phase.WaitForGreen;
@@ -112,14 +113,15 @@ public class ScenarioNarration : MonoBehaviour
 
     public void OnReachedOtherSide()
     {
+        // AUDIO: FINAL AUDIO (RECAP+EXPLANATION)
         if (CurrentPhase != Phase.CrossStreet) return;
-        Debug.Log("[NAV] Tunnel vision limits situational awareness. Hazards aren't invisible, they're simply unseen until they enter your narrow field of view. " +
-                  "[NAV] This makes everyday tasks like crossing a street stressful and dangerous.");
+        // Debug.Log("[NAV] Tunnel vision limits situational awareness. Hazards aren't invisible, they're simply unseen until they enter your narrow field of view. " +
+        //           "[NAV] This makes everyday tasks like crossing a street stressful and dangerous.");
 
-        Debug.Log("[NAV] What you experienced is common for people with peripheral vision loss. Millions navigate daily life with limited vision. " +
-                  "[NAV] Thoughtful design, safer crossings, clearer signals, and patience can make streets safer for everyone.");
+        // Debug.Log("[NAV] What you experienced is common for people with peripheral vision loss. Millions navigate daily life with limited vision. " +
+        //           "[NAV] Thoughtful design, safer crossings, clearer signals, and patience can make streets safer for everyone.");
 
-        Debug.Log("[NAV] Whenever you're ready, you can head back through the door to return to the initial room.");
+        // Debug.Log("[NAV] Whenever you're ready, you can head back through the door to return to the initial room.");
         StartCoroutine(FinalAudio());
 
         CurrentPhase = Phase.Done;

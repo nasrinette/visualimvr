@@ -33,15 +33,11 @@ public class LightTrafficController : MonoBehaviour
     public CarHonkManager carHonkManager;
 
     public float waitTime = 6f;
-    public float pedsGreenDuration = 8f;
+    public float pedsGreenDuration = 4f;
 
     public SignalState state = SignalState.CarsGreen_PedsRed;
 
-
-    public ScenarioNarration scenario;
-
     bool isWaiting;
-    // bool honked = false;
 
     // the cars stop if it's red for them OR if it's green but the player is currenlty inside the crosswalk area
     public bool ShouldCarsStop => (state == SignalState.CarsRed_PedsGreen) || ((state == SignalState.CarsGreen_PedsRed) && crosswalkArea != null && crosswalkArea.playerInside);
@@ -49,7 +45,6 @@ public class LightTrafficController : MonoBehaviour
 
     void Awake()
     {
-        // audioSource = GetComponent<AudioSource>();
         ApplyVisuals();
     }
 
@@ -92,22 +87,12 @@ public class LightTrafficController : MonoBehaviour
         // cars are green but player is still in crosswalk
         bool shouldHonk = (state == SignalState.CarsGreen_PedsRed) && (crosswalkArea != null && crosswalkArea.playerInside);
 
-    if (shouldHonk)
-        carHonkManager.StartHonkingIfNeeded();
-    else
-        carHonkManager.StopHonkingAndReset();
+        if (shouldHonk)
+            carHonkManager.StartHonking();
+        else
+            carHonkManager.StopHonking();
 
 
-        // if (shouldHonk && !honked) // todo fix that??
-        // {
-        //     if (carHonkManager.TryHonkNow())
-        //         honked = true;
-        //      // honk front car once
-        // }
-
-        // Reset so it can honk again next cycle
-        // if (!shouldHonk)//|| state == SignalState.CarsRed_PedsGreen)
-        //     honked = false;
     }
 
     void SetState(SignalState newState)
@@ -118,6 +103,7 @@ public class LightTrafficController : MonoBehaviour
 
     void ApplyVisuals()
     {
+        // this function is to cover the red of green pedestrian image for the light traffic corresponding to the state
         bool pedsGreen = (state == SignalState.CarsRed_PedsGreen);
 
         redLightCover.SetActive(pedsGreen);

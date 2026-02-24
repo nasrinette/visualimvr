@@ -4,12 +4,10 @@ using System.Collections.Generic;
 
 public class CarStopLine : MonoBehaviour
 {
-
     // this script is attached to each stop line, we have multiple stop lines so that if multiple cars need to stop
     // they stay in queue, one behing each other
 
     public LightTrafficController signal;
-
 
     public bool isFrontStopLine = false;
     public CarStopLine lineAhead;  // it's the line after this one, to check if it's occupied or not (if a car is ahead or not) 
@@ -29,17 +27,13 @@ public class CarStopLine : MonoBehaviour
         var cart = other.GetComponentInParent<CinemachineDollyCart>();
         if (cart == null) return;
 
-        // if (isFrontStopLine)
-        // {
         currentCar = cart;
-        // }
 
     }
 
     bool HasPassedLine(Transform carT)
     {
-        // If car is in front of the stop line plane, it has passed.
-        // + means in front (same direction as stop line forward)
+        // if car is in front of the stop line plane, it has passed
         Vector3 fwd = transform.forward;
         Vector3 toCar = carT.position - transform.position;
         return Vector3.Dot(fwd, toCar) > 0f;
@@ -50,7 +44,7 @@ public class CarStopLine : MonoBehaviour
         var cart = other.GetComponentInParent<CinemachineDollyCart>();
         if (cart == null || signal == null) return;
 
-        if (isFrontStopLine && HasPassedLine(cart.transform))
+        if (isFrontStopLine && HasPassedLine(cart.transform)) // if the first car has passed the stop line already, it can continue, so that it doesnt stay in the middle of the crosswalk
         {
             Release(cart);
             if (currentCar == cart) currentCar = null;
@@ -91,9 +85,7 @@ public class CarStopLine : MonoBehaviour
 
     public void Hold(CinemachineDollyCart car)
     {
-        // if (car == null) return;
-        // if (!saved.ContainsKey(car)) saved[car] = car.m_Speed; // we keep the car speed
-        // car.m_Speed = 0f; // stop car
+        // saved the speed of the car; or fallback speed if the speed was close to 0
         if (car == null) return;
 
         if (!saved.ContainsKey(car))
@@ -105,6 +97,7 @@ public class CarStopLine : MonoBehaviour
 
     public void Release(CinemachineDollyCart car)
     {
+        // we retrieve the speed of the car before it stopped
         if (car == null) return;
 
         if (saved.TryGetValue(car, out var speed))

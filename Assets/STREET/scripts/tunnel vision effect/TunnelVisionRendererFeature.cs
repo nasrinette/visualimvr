@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
 
-// using this tutorial: https://git.wur.nl/farma002/env-urban-vr/-/blob/240042b451574b68849ca8cf6513bc3d41aaa413/Env-Urban-URP/Library/PackageCache/com.unity.render-pipelines.universal@14.0.11/Documentation~/renderer-features/create-custom-renderer-feature.md
+// using this tutorial: https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@16.0/manual/renderer-features/create-custom-renderer-feature.html
 
 public class TunnelVisionRendererFeature : ScriptableRendererFeature
 {
@@ -38,10 +38,5 @@ public class TunnelVisionRendererFeature : ScriptableRendererFeature
 
     }
 
-    // Optional: expose the material to other scripts (XR driver)
-    public Material GetMaterial() => material;
-
-    // Optional: expose settings to other scripts
-    public TunnelVisionSettings GetSettings() => settings;
 
 }

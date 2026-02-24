@@ -22,21 +22,11 @@ public class ExitRoom : MonoBehaviour
     [Tooltip("Seconds to ignore triggers after room activates (prevents instant exit on entry)")]
     public float entryCooldown = 1f;
 
-    private Material baseSkybox;
-    private AmbientMode baseAmbientMode;
-    private Color baseAmbientColor;
-    private DefaultReflectionMode baseReflectionMode;
     private float activationTime;
 
-public EnvironmentState envState;
+    public EnvironmentState envState;
 
-    void Start()
-    {
-        // baseSkybox = RenderSettings.skybox;
-        // baseAmbientMode = RenderSettings.ambientMode;
-        // baseAmbientColor = RenderSettings.ambientLight;
-        // baseReflectionMode = RenderSettings.defaultReflectionMode;
-    }
+
 
     void OnEnable()
     {
@@ -60,14 +50,10 @@ public EnvironmentState envState;
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
 
-            // RenderSettings.skybox = baseSkybox;
-            // RenderSettings.ambientMode = baseAmbientMode;
-            // RenderSettings.ambientLight = baseAmbientColor;
-            // RenderSettings.defaultReflectionMode = baseReflectionMode;
             DynamicGI.UpdateEnvironment();
-            
+
             if (envState != null) envState.Restore();
-            
+
             if (audioSource != null)
             {
                 audioSource.Stop();
@@ -75,9 +61,7 @@ public EnvironmentState envState;
                 audioSource.loop = false;
             }
 
-            if (tunnelController !=null) tunnelController.SetTunnelActive(false);
-
-            
+            if (tunnelController != null) tunnelController.SetTunnelActive(false);
         }
     }
 }
