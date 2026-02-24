@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PedestrianEventController : MonoBehaviour
 {
+    // this class controls the pedestrian that will be spawn and will hit the player when the player press the button and waits for the green light
     public Transform spawnPosition;
 
     public GameObject pedestrianPrefab;
@@ -20,7 +21,6 @@ public class PedestrianEventController : MonoBehaviour
 
     public Transform exitTarget;
 
-    public float stopDuration = 0.6f;
     public float approachDurationMax = 6f; // safety so it doesn't loop forever
 
 
@@ -28,27 +28,28 @@ public class PedestrianEventController : MonoBehaviour
 
     public void StartWaitForGreenMoment()
     {
-        Debug.Log("StartWaitForGreenMoment");
         if (routine != null) StopCoroutine(routine);
         routine = StartCoroutine(PedestrianBumpSequence());
     }
 
     Vector3 GetBumpPoint()
     {
+        // retrieves the point where it will hit the player
+        // takes the current xr camera position and position it a little forward and on the right
         Vector3 forward = xrCamera.forward;
         forward.y = 0f;
         forward.Normalize();
 
-
         Vector3 bumpPos = xrOrigin.position + forward * 1.2f;
         bumpPos += xrCamera.right * 0.1f;
         bumpPos.y = xrOrigin.position.y;
-        // Add roation y axis 110
         return bumpPos;
     }
 
     IEnumerator RotateYTo(Transform tr, float targetY, float duration)
     {
+        // helper function to rotate the pedestrian to say its audio line 
+        // rotates smoothly
         float startY = tr.eulerAngles.y;
         float t = 0f;
 
@@ -75,50 +76,54 @@ public class PedestrianEventController : MonoBehaviour
         {
             yield break;
         }
+
+        // makes the pedestrian move to bumppoint and stops when it's close to the bumpPoint
         float t = 0f;
         while (t < approachDurationMax)
         {
             Vector3 bumpPoint = GetBumpPoint();
             ped.GoToPosition(bumpPoint);
 
-            // stop when pedestrian is close to the bump point in front
+            // stop when pedestrian is close to the bump point
             if (Vector3.Distance(newPedestrian.transform.position, bumpPoint) <= 0.25f)
                 break;
 
             t += Time.deltaTime;
             yield return null;
         }
-        yield return StartCoroutine(RotateYTo(newPedestrian.transform, 50f, 0.25f));
 
-        
+        // interpelation part: character turn; stops; say "hey...!" 
+        // turns
+        yield return StartCoroutine(RotateYTo(newPedestrian.transform, 50f, 0.25f)); 
 
+        // hit sound + say line
         source = newPedestrian.GetComponent<AudioSource>();
-
-        // this is to be sure we wait until the pedestrian is close to user to fire the sounds
 
         if (secondSource && hitSound)
         {
             secondSource.clip = hitSound;
             secondSource.Play();
-            // yield return new WaitForSeconds(hitSound.length);
         }
+
         if (source && pedestrianTalking)
         {
             source.clip = pedestrianTalking;
             source.Play();
         }
+        // effect on vision 
         if (tunnelVisionInput != null)
         {
             tunnelVisionInput.ReduceBaseRadius(0.02f);
 
         }
-
+        // stops
         ped.StopMoving();
-
         yield return new WaitForSeconds(1.0f);
         
+        // rotate in right direction to continue
         yield return StartCoroutine(RotateYTo(newPedestrian.transform, 180f, 0.25f));
 
+        // continue moving on its path until the exit Target (a target that I set)
         ped.ResumeMoving();
         if (exitTarget != null)
             ped.GoToPosition(exitTarget.position);

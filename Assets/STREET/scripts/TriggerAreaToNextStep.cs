@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class TriggerAreaToNextStep : MonoBehaviour
 {
+    // this class is a helper for the scenario for the street scene, to go to corresponding next step
     public enum TriggerType
     {
         BeginTryExpand,
@@ -19,19 +20,12 @@ public class TriggerAreaToNextStep : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-        
+
         switch (triggerType)
         {
-            case TriggerType.StartCrossing:
-                // scenario.OnReachedCrosswalkArea();
-                break;
             case TriggerType.EndCrossing:
-                Debug.Log("in end ");
                 scenario.OnReachedOtherSide();
                 break;
-            // case TriggerType.BeginTryExpand:
-            //     scenario.BeginTryExpandPhase();
-            //     break;
             case TriggerType.StartScene:
                 {
                     if (alreadyWentIntoStartTrigger) return;

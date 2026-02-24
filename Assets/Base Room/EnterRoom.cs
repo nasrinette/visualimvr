@@ -67,10 +67,9 @@ public class EnterRoom : MonoBehaviour
         baseReflectionMode = RenderSettings.defaultReflectionMode;
 
         if (envState != null && !envState.hasSnapshot)
-{
-    envState.CaptureCurrent();
-    Debug.Log($"[EnvState] Captured on Start: {RenderSettings.skybox?.name}");
-}
+        {
+            envState.CaptureCurrent();
+        }
 
         missionManager = FindObjectOfType<MissionManager>();
         if (missionManager == null)
@@ -212,7 +211,6 @@ public class EnterRoom : MonoBehaviour
                 supermarketFrame.SetActive(false);
                 streetFrame.SetActive(false);
 
-                // if (envState != null) envState.CaptureCurrent();
 
                 if (classroomSkybox != null)
                 {

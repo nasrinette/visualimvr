@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class ExitStreetRoom : MonoBehaviour
 {
+    // this class is similar to ExitRoom (classic script used for the other rooms)
+    // but here for the street, since the door is placed at another place, we need to re-position the user
+    // in the correct place in the base room, when the user exits 
+    // to do so, i placed a destination object where i want the user to be re-positionned to
     public GameObject street;
 
     public GameObject supermarketFrame;
@@ -12,8 +16,6 @@ public class ExitStreetRoom : MonoBehaviour
 
 
     public GameObject baseRoom;
-
-    // Start is called before the first frame update
 
     public AudioSource audioSource;
 
@@ -38,22 +40,22 @@ public class ExitStreetRoom : MonoBehaviour
             xrOrigin.position = destination.position;
             xrOrigin.rotation = destination.rotation;
 
-            street.SetActive(false);
+            street.SetActive(false); // hide street
 
-
+            // display baseroom and all frames
             baseRoom.SetActive(true);
-
             supermarketFrame.SetActive(true);
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
 
+            // portal sound
             audioSource.loop = false;
             audioSource.clip = portalSound;
             audioSource.Play();
 
             tunnelController.SetTunnelActive(false);
 
-            doorStreet.SetActive(true);
+            doorStreet.SetActive(true); 
         }
     }
 
