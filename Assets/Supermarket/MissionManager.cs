@@ -47,8 +47,6 @@ public class MissionManager : MonoBehaviour
     private SupermarketItem.ItemType currentObjective;
     private bool hasMissionActive = false;
 
-    [SerializeField] private ScenarioUIManager uiManager;
-
     void Start()
     {
         StartIntroduction();
@@ -91,8 +89,6 @@ public class MissionManager : MonoBehaviour
         currentObjective = SupermarketItem.ItemType.Tomato;
         hasMissionActive = true;
         Debug.Log("Mission: Bring me a ripe tomato!");
-        if (uiManager != null)
-            uiManager.ShowGoToSupermarketInstruction();
     }
 
     void StartMissionPepper()
@@ -101,8 +97,6 @@ public class MissionManager : MonoBehaviour
         currentObjective = SupermarketItem.ItemType.BellPepper;
         hasMissionActive = true;
         Debug.Log("Mission: Bring me a green bell pepper!");
-        if (uiManager != null)
-            uiManager.ShowGoToSupermarketInstruction();
     }
 
     void StartMissionGrapes()
@@ -111,8 +105,6 @@ public class MissionManager : MonoBehaviour
         currentObjective = SupermarketItem.ItemType.Grapes;
         hasMissionActive = true;
         Debug.Log("Mission: Bring me purple grapes!");
-        if (uiManager != null)
-            uiManager.ShowGoToSupermarketInstruction();
     }
 
     public void OnItemDelivered(SupermarketItem item)
@@ -127,9 +119,6 @@ public class MissionManager : MonoBehaviour
         if (item.itemType != currentObjective)
         {
             Debug.LogWarning($"❌ WRONG ITEM! Expected {currentObjective} but got {item.itemType}");
-
-            if (uiManager != null)
-                uiManager.ShowErrorState("Wrong item! Try again.");
             return;
         }
 
@@ -189,8 +178,6 @@ public class MissionManager : MonoBehaviour
             currentPhase = MissionPhase.AllComplete;
             supermarketTasksComplete = true;
             Debug.Log("All missions complete! ✓");
-            if (uiManager != null)
-                uiManager.UpdateMissionText();
 
             // Wait for the reveal clip to finish, then play completion dialogue
             float revealDuration = lastRevealClip != null ? lastRevealClip.length : 0f;
@@ -203,8 +190,6 @@ public class MissionManager : MonoBehaviour
         else
         {
             currentPhase = MissionPhase.Introduction;
-            if (uiManager != null)
-                uiManager.UpdateMissionText();
         }
     }
 
