@@ -7,25 +7,35 @@ public class CharacterInteractOnPoint : MonoBehaviour
     [Header("Point and Click Interaction")]
     [SerializeField] private InputActionReference aButtonAction;
     [SerializeField] private XRRayInteractor rayInteractor;
-    [SerializeField] private AudioClip[] dialogueClips; // Array of audio clips for general interaction
-    
+    [SerializeField] private AudioClip[] dialogueClips;
+
     private Animator animator;
     private AudioSource audioSource;
     private int currentClipIndex = 0;
     private MissionManager missionManager;
+    private bool isReceivingItem = false;
 
     void Start()
     {
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        
-        // Add AudioSource if it doesn't exist
+
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.spatialBlend = 1f;
+            audioSource.minDistance = 1f;
+            audioSource.maxDistance = 10f;
+            audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         }
-        
-        // Find mission manager
+        else
+        {
+            audioSource.spatialBlend = 1f;
+            audioSource.minDistance = 1f;
+            audioSource.maxDistance = 10f;
+            audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        }
+
         missionManager = FindObjectOfType<MissionManager>();
     }
 
@@ -45,20 +55,19 @@ public class CharacterInteractOnPoint : MonoBehaviour
         {
             if (hit.collider.gameObject == gameObject)
             {
-                // Normal interaction - cycle through dialogues
                 animator.SetTrigger("Interact");
                 PlayNextDialogue();
             }
         }
     }
 
+
     void OnTriggerEnter(Collider other)
     {
-        // Check if a supermarket item touched the guide
         SupermarketItem item = other.GetComponent<SupermarketItem>();
-        
-        if (item != null)
+        if (item != null && !isReceivingItem)
         {
+            isReceivingItem = true;
             ReceiveItem(item);
         }
     }
@@ -66,19 +75,22 @@ public class CharacterInteractOnPoint : MonoBehaviour
     private void ReceiveItem(SupermarketItem item)
     {
         Debug.Log($"Guide received: {item.itemType}");
-        
-        // Trigger animation
         animator.SetTrigger("Interact");
-        
-        // Tell mission manager about the delivery
+
         if (missionManager != null)
-        {
             missionManager.OnItemDelivered(item);
-        }
-        
-        // Destroy the item
+
         Destroy(item.gameObject);
+
+        // Reset after a short delay in case another item is delivered shortly after
+        Invoke(nameof(ResetReceiving), 1f);
     }
+
+    private void ResetReceiving()
+    {
+        isReceivingItem = false;
+    }
+
 
     private void PlayNextDialogue()
     {
@@ -86,22 +98,15 @@ public class CharacterInteractOnPoint : MonoBehaviour
         {
             audioSource.clip = dialogueClips[currentClipIndex];
             audioSource.Play();
-            
-            // Move to next clip, loop back to start if at end
             currentClipIndex = (currentClipIndex + 1) % dialogueClips.Length;
         }
     }
 
-    // This method is called by GlassesInteractable when glasses are picked up
     public void PlayDialogue(AudioClip clip)
     {
-        // Trigger the interact animation
         if (animator != null)
-        {
             animator.SetTrigger("Interact");
-        }
 
-        // Play the specific audio clip
         if (audioSource != null && clip != null)
         {
             audioSource.clip = clip;

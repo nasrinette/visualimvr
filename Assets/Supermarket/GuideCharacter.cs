@@ -9,23 +9,30 @@ public class GuideCharacter : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        
-        // Add AudioSource if it doesn't exist
+
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.spatialBlend = 1f;
+            audioSource.minDistance = 1f;
+            audioSource.maxDistance = 10f;
+            audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        }
+        else
+        {
+            // Also configure if it already existed on the GameObject
+            audioSource.spatialBlend = 1f;
+            audioSource.minDistance = 1f;
+            audioSource.maxDistance = 10f;
+            audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         }
     }
 
     public void PlayDialogue(AudioClip clip)
     {
-        // Trigger the interact animation
         if (animator != null)
-        {
             animator.SetTrigger("Interact");
-        }
 
-        // Play the audio
         if (audioSource != null && clip != null)
         {
             audioSource.clip = clip;

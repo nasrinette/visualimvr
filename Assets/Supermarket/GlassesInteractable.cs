@@ -25,6 +25,8 @@ public class GlassesInteractable : MonoBehaviour
     
     private static bool isWearingGlasses = false;
     private static ColorblindTypes currentGlassesType;
+    private bool hasPlayedDialogue = false; 
+
     
     // Track hover attempts
     private bool hasShownWarning = false;
@@ -69,7 +71,7 @@ public class GlassesInteractable : MonoBehaviour
         // Disable interaction if already wearing glasses
         if (grabInteractable != null)
         {
-            // Only allow interaction if not wearing glasses OR these are the glasses being worn
+            // Only allow interaction if not wearing glasses 
             grabInteractable.enabled = !isWearingGlasses;
         }
     }
@@ -96,21 +98,18 @@ public class GlassesInteractable : MonoBehaviour
         hasShownWarning = false;
     }
 
+
     void OnGlassesGrabbed(SelectEnterEventArgs args)
     {
-        // Double check - should not reach here if Update() is working
         if (isWearingGlasses)
         {
-            Debug.LogWarning("Glasses grab attempted while already wearing - this shouldn't happen!");
             grabInteractable.interactionManager.CancelInteractableSelection(grabInteractable);
             return;
         }
 
-        // Mark glasses as being worn
         isWearingGlasses = true;
         currentGlassesType = colorblindType;
 
-        // Apply the colorblind filter
         if (Colorblindness.Instance != null)
         {
             Colorblindness.Instance.Change((int)colorblindType);
@@ -121,35 +120,29 @@ public class GlassesInteractable : MonoBehaviour
             Debug.LogWarning("Colorblindness system not found in scene!");
         }
 
-        // Tell the guide character to play dialogue
-        if (guideCharacter != null && dialogueClip != null)
+        // Only play dialogue once per grab
+        if (!hasPlayedDialogue && guideCharacter != null && dialogueClip != null)
         {
             guideCharacter.PlayDialogue(dialogueClip);
+            hasPlayedDialogue = true;
         }
 
-        // Tell mission manager which glasses were picked up
         if (missionManager != null)
         {
-            Debug.Log($"Notifying MissionManager: {colorblindType} glasses picked up");
             missionManager.OnGlassesPickedUp(colorblindType);
-            
             EnterRoom enterRoom = FindObjectOfType<EnterRoom>();
             if (enterRoom != null)
-            {
                 enterRoom.RefreshDoorBlockers();
-            }
         }
         else
         {
             Debug.LogError("Cannot notify MissionManager - it's null!");
         }
 
-        // Hide the glasses
         if (hideOnGrab)
-        {
             gameObject.SetActive(false);
-        }
     }
+
 
     public static void RemoveGlasses()
     {
