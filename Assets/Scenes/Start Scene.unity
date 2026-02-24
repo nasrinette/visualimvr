@@ -6971,7 +6971,6 @@ MonoBehaviour:
   xrOrigin: {fileID: 1728717102}
   xrCamera: {fileID: 1731298985}
   exitTarget: {fileID: 56607001}
-  stopDuration: 2
   approachDurationMax: 6
   tunnelVisionInput: {fileID: 477144730}
 --- !u!4 &400052482
@@ -7702,14 +7701,9 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   tunnelMaterial: {fileID: 2100000, guid: 659f0464b177041199f60c348c8c3ccb, type: 2}
-  gripThreshold: 0.4
-  minDist: 0.2
-  maxDist: 0.6
   baseRadius: 0.18
   maxExtraRadius: 0.08
   expandSpeed: 12
-  snapSpeed: 18
-  debugKey: 101
   scenario: {fileID: 758687891}
 --- !u!4 &477144731
 Transform:
@@ -11261,7 +11255,6 @@ MonoBehaviour:
   waitTime: 6
   pedsGreenDuration: 8
   state: 0
-  scenario: {fileID: 758687891}
 --- !u!1 &680465019
 GameObject:
   m_ObjectHideFlags: 0
@@ -12789,7 +12782,6 @@ MonoBehaviour:
   tryExpandClip: {fileID: 8300000, guid: a0fb2b8bd5b5149f68748a98d12dab0c, type: 3}
   afterTryExpandClip: {fileID: 8300000, guid: 7b0dc999c418540b5b389a7f12c8ca61, type: 3}
   findButtonClip: {fileID: 8300000, guid: f3c1a4b04707d46a9b53285c479a1459, type: 3}
-  goSafeClip: {fileID: 8300000, guid: 81a178f384b1a461bbd6d52798cc7bc5, type: 3}
   infoTunnelVisionClip: {fileID: 8300000, guid: 9f67965a0a82e4de9a22fa5256afed12, type: 3}
   recapClip: {fileID: 8300000, guid: fb4b5d714780b412f9fd4a6c02eec93e, type: 3}
   exitDoorClip: {fileID: 8300000, guid: 5f124b8108c92429bb856aac3d4db750, type: 3}
