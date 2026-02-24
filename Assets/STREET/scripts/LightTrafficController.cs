@@ -27,7 +27,7 @@ public class LightTrafficController : MonoBehaviour
     public AudioClip beepSound;
     public AudioClip waitSound;
     public AudioClip greenSound;
-    private AudioSource audioSource;
+    public AudioSource audioSource;
 
     public CrosswalkArea crosswalkArea;
     public CarHonkManager carHonkManager;
@@ -41,7 +41,7 @@ public class LightTrafficController : MonoBehaviour
     public ScenarioNarration scenario;
 
     bool isWaiting;
-    bool honked = false;
+    // bool honked = false;
 
     // the cars stop if it's red for them OR if it's green but the player is currenlty inside the crosswalk area
     public bool ShouldCarsStop => (state == SignalState.CarsRed_PedsGreen) || ((state == SignalState.CarsGreen_PedsRed) && crosswalkArea != null && crosswalkArea.playerInside);
@@ -49,7 +49,7 @@ public class LightTrafficController : MonoBehaviour
 
     void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
+        // audioSource = GetComponent<AudioSource>();
         ApplyVisuals();
     }
 
@@ -92,16 +92,22 @@ public class LightTrafficController : MonoBehaviour
         // cars are green but player is still in crosswalk
         bool shouldHonk = (state == SignalState.CarsGreen_PedsRed) && (crosswalkArea != null && crosswalkArea.playerInside);
 
-        if (shouldHonk && !honked) // todo fix that??
-        {
-            if (carHonkManager.TryHonkNow())
-                honked = true;
-             // honk front car once
-        }
+    if (shouldHonk)
+        carHonkManager.StartHonkingIfNeeded();
+    else
+        carHonkManager.StopHonkingAndReset();
+
+
+        // if (shouldHonk && !honked) // todo fix that??
+        // {
+        //     if (carHonkManager.TryHonkNow())
+        //         honked = true;
+        //      // honk front car once
+        // }
 
         // Reset so it can honk again next cycle
-        if (!shouldHonk)//|| state == SignalState.CarsRed_PedsGreen)
-            honked = false;
+        // if (!shouldHonk)//|| state == SignalState.CarsRed_PedsGreen)
+        //     honked = false;
     }
 
     void SetState(SignalState newState)

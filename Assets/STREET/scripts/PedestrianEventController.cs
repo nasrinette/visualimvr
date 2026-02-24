@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PedestrianEventController : MonoBehaviour
@@ -7,7 +8,8 @@ public class PedestrianEventController : MonoBehaviour
 
     public GameObject pedestrianPrefab;
 
-    public AudioSource source;
+    private AudioSource source;
+    public AudioSource secondSource;
     public AudioClip pedestrianTalking;
     public AudioClip hitSound;
 
@@ -18,13 +20,15 @@ public class PedestrianEventController : MonoBehaviour
 
     public Transform exitTarget;
 
-    public float stopDuration = 0.8f;
+    public float stopDuration = 0.6f;
     public float approachDurationMax = 6f; // safety so it doesn't loop forever
+
 
     public TunnelVisionInput tunnelVisionInput;
 
     public void StartWaitForGreenMoment()
     {
+        Debug.Log("StartWaitForGreenMoment");
         if (routine != null) StopCoroutine(routine);
         routine = StartCoroutine(PedestrianBumpSequence());
     }
@@ -35,18 +39,37 @@ public class PedestrianEventController : MonoBehaviour
         forward.y = 0f;
         forward.Normalize();
 
-        Vector3 bumpPos = xrOrigin.position + forward * 0.6f;
+
+        Vector3 bumpPos = xrOrigin.position + forward * 1.2f;
         bumpPos += xrCamera.right * 0.1f;
         bumpPos.y = xrOrigin.position.y;
-
+        // Add roation y axis 110
         return bumpPos;
+    }
+
+    IEnumerator RotateYTo(Transform tr, float targetY, float duration)
+    {
+        float startY = tr.eulerAngles.y;
+        float t = 0f;
+
+        while (t < duration)
+        {
+            float y = Mathf.LerpAngle(startY, targetY, t / duration);
+            tr.rotation = Quaternion.Euler(0f, y, 0f);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        tr.rotation = Quaternion.Euler(0f, targetY, 0f);
     }
 
     IEnumerator PedestrianBumpSequence()
     {
+        Debug.Log("fired pedestrian");
         yield return new WaitForSeconds(1.0f);
 
         var newPedestrian = Instantiate(pedestrianPrefab, spawnPosition.position, spawnPosition.rotation);
+
         var ped = newPedestrian.GetComponent<CharacterWalking>();
         if (ped == null)
         {
@@ -65,18 +88,19 @@ public class PedestrianEventController : MonoBehaviour
             t += Time.deltaTime;
             yield return null;
         }
+        yield return StartCoroutine(RotateYTo(newPedestrian.transform, 50f, 0.25f));
 
-        ped.StopMoving();
+        
 
         source = newPedestrian.GetComponent<AudioSource>();
 
         // this is to be sure we wait until the pedestrian is close to user to fire the sounds
 
-        if (source && hitSound)
+        if (secondSource && hitSound)
         {
-            source.clip = hitSound;
-            source.Play();
-            yield return new WaitForSeconds(hitSound.length);
+            secondSource.clip = hitSound;
+            secondSource.Play();
+            // yield return new WaitForSeconds(hitSound.length);
         }
         if (source && pedestrianTalking)
         {
@@ -89,7 +113,11 @@ public class PedestrianEventController : MonoBehaviour
 
         }
 
-        yield return new WaitForSeconds(stopDuration);
+        ped.StopMoving();
+
+        yield return new WaitForSeconds(1.0f);
+        
+        yield return StartCoroutine(RotateYTo(newPedestrian.transform, 180f, 0.25f));
 
         ped.ResumeMoving();
         if (exitTarget != null)
