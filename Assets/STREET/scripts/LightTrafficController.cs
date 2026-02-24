@@ -41,7 +41,7 @@ public class LightTrafficController : MonoBehaviour
     public ScenarioNarration scenario;
 
     bool isWaiting;
-    bool honked = false;
+    // bool honked = false;
 
     // the cars stop if it's red for them OR if it's green but the player is currenlty inside the crosswalk area
     public bool ShouldCarsStop => (state == SignalState.CarsRed_PedsGreen) || ((state == SignalState.CarsGreen_PedsRed) && crosswalkArea != null && crosswalkArea.playerInside);
