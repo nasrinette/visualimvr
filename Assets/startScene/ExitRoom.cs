@@ -28,12 +28,14 @@ public class ExitRoom : MonoBehaviour
     private DefaultReflectionMode baseReflectionMode;
     private float activationTime;
 
+public EnvironmentState envState;
+
     void Start()
     {
-        baseSkybox = RenderSettings.skybox;
-        baseAmbientMode = RenderSettings.ambientMode;
-        baseAmbientColor = RenderSettings.ambientLight;
-        baseReflectionMode = RenderSettings.defaultReflectionMode;
+        // baseSkybox = RenderSettings.skybox;
+        // baseAmbientMode = RenderSettings.ambientMode;
+        // baseAmbientColor = RenderSettings.ambientLight;
+        // baseReflectionMode = RenderSettings.defaultReflectionMode;
     }
 
     void OnEnable()
@@ -58,12 +60,14 @@ public class ExitRoom : MonoBehaviour
             streetFrame.SetActive(true);
             classroomFrame.SetActive(true);
 
-            RenderSettings.skybox = baseSkybox;
-            RenderSettings.ambientMode = baseAmbientMode;
-            RenderSettings.ambientLight = baseAmbientColor;
-            RenderSettings.defaultReflectionMode = baseReflectionMode;
+            // RenderSettings.skybox = baseSkybox;
+            // RenderSettings.ambientMode = baseAmbientMode;
+            // RenderSettings.ambientLight = baseAmbientColor;
+            // RenderSettings.defaultReflectionMode = baseReflectionMode;
             DynamicGI.UpdateEnvironment();
-
+            
+            if (envState != null) envState.Restore();
+            
             if (audioSource != null)
             {
                 audioSource.Stop();
@@ -72,6 +76,8 @@ public class ExitRoom : MonoBehaviour
             }
 
             if (tunnelController !=null) tunnelController.SetTunnelActive(false);
+
+            
         }
     }
 }

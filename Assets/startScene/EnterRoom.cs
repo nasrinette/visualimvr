@@ -49,6 +49,11 @@ public class EnterRoom : MonoBehaviour
     private DefaultReflectionMode baseReflectionMode;
     public AudioSource blockedEntrySound;
 
+    public AudioSource portalSource;
+    public AudioClip portalSound;
+
+    public EnvironmentState envState;
+
     void Start()
     {
         supermarket.SetActive(false);
@@ -60,6 +65,13 @@ public class EnterRoom : MonoBehaviour
         baseAmbientMode = RenderSettings.ambientMode;
         baseAmbientColor = RenderSettings.ambientLight;
         baseReflectionMode = RenderSettings.defaultReflectionMode;
+
+        if (envState != null && !envState.hasSnapshot)
+{
+    envState.CaptureCurrent();
+    Debug.Log($"[EnvState] Captured on Start: {RenderSettings.skybox?.name}");
+}
+
         missionManager = FindObjectOfType<MissionManager>();
         if (missionManager == null)
         {
@@ -129,7 +141,11 @@ public class EnterRoom : MonoBehaviour
                     uiManager.ShowScenarioInfo("Supermarket");
                     // This will update to show "Mission: Bring a ripe tomato" etc.
                 }
-                if (tunnelController!=null) tunnelController.SetTunnelActive(false);
+                if (tunnelController != null) tunnelController.SetTunnelActive(false);
+
+                PlayPortalSound();
+
+
             }
 
             // STREET: Can only enter if supermarket tasks are NOT complete yet
@@ -171,7 +187,9 @@ public class EnterRoom : MonoBehaviour
                     uiManager.ShowScenarioInfo("Street");
                 }
 
-                if (tunnelController!=null) tunnelController.SetTunnelActive(true);
+                if (tunnelController != null) tunnelController.SetTunnelActive(true);
+
+                PlayPortalSound();
             }
 
             // CLASSROOM: Can only enter if supermarket tasks are NOT complete yet
@@ -194,6 +212,8 @@ public class EnterRoom : MonoBehaviour
                 supermarketFrame.SetActive(false);
                 streetFrame.SetActive(false);
 
+                // if (envState != null) envState.CaptureCurrent();
+
                 if (classroomSkybox != null)
                 {
                     RenderSettings.skybox = classroomSkybox;
@@ -208,7 +228,9 @@ public class EnterRoom : MonoBehaviour
                 {
                     uiManager.ShowScenarioInfo("Classroom");
                 }
-                if (tunnelController!=null) tunnelController.SetTunnelActive(false);
+                if (tunnelController != null) tunnelController.SetTunnelActive(false);
+
+                PlayPortalSound();
             }
         }
     }
@@ -226,5 +248,15 @@ public class EnterRoom : MonoBehaviour
     public void RefreshDoorBlockers()
     {
         UpdateDoorBlockers();
+    }
+
+    public void PlayPortalSound()
+    {
+        if (portalSource != null && portalSound != null)
+        {
+            portalSource.loop = false;
+            portalSource.clip = portalSound;
+            portalSource.Play();
+        }
     }
 }
