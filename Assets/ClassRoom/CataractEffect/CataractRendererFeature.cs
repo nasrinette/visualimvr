@@ -10,9 +10,9 @@ public class CataractRendererFeature : ScriptableRendererFeature
     private CataractRenderPass pass;
     private bool effectActive;
 
+    // init material + pass
     public override void Create()
     {
-        // Auto-create material from shader (no manual .mat needed)
         var shader = Shader.Find("Hidden/CataractFullscreen");
         if (shader == null)
         {
@@ -27,12 +27,14 @@ public class CataractRendererFeature : ScriptableRendererFeature
         };
     }
 
+    // enqueue if active
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         if (!effectActive || material == null || pass == null) return;
         renderer.EnqueuePass(pass);
     }
 
+    // cleanup resources
     protected override void Dispose(bool disposing)
     {
         pass?.Dispose();

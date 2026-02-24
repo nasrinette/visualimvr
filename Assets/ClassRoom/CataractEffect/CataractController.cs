@@ -2,17 +2,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-/// <summary>
-/// Drives cataract shader parameters based on scene brightness from RoomDarknessController.
-///
-/// Real cataract behaviour:
-///   - Bright sunlight: WORST vision (heavy glare, scatter, veiling, reduced contrast)
-///   - Moderate indoor light: BEST vision (minimal scatter, just base cloudiness)
-///   - Dark: poor vision (dilated pupil exposes more clouded lens, extra blur)
-///
-/// The effect is always present (the lens is physically clouded) but the
-/// brightness-dependent symptoms scale dramatically with light level.
-/// </summary>
 public class CataractController : MonoBehaviour
 {
     [Header("References")]
@@ -20,7 +9,7 @@ public class CataractController : MonoBehaviour
     [SerializeField] private RoomDarknessController roomDarkness;
 
     [Header("Base Severity (always present regardless of light)")]
-    [Tooltip("Poisson blur radius - the permanent cloudiness of the lens")]
+    [Tooltip("Poisson blur radius the permanent cloudiness of the lens")]
     [Range(0.001f, 0.01f)] public float baseBlur = 0.003f;
     [Tooltip("Baseline contrast loss from the clouded lens")]
     [Range(0f, 0.3f)] public float baseContrastLoss = 0.10f;
@@ -63,12 +52,10 @@ public class CataractController : MonoBehaviour
     private float originalBloomThreshold;
     private bool hadBloom;
 
-    // Smoothed current values
     private float curBlur, curScatter, curContrast, curVeil, curBloomInt, curBloomThresh;
 
     void Start()
     {
-        // Find the CataractRendererFeature and its material
         if (rendererData != null)
         {
             foreach (var feature in rendererData.rendererFeatures)
@@ -90,7 +77,6 @@ public class CataractController : MonoBehaviour
         if (roomDarkness == null)
             roomDarkness = FindObjectOfType<RoomDarknessController>();
 
-        // Find Bloom override
         var volumes = FindObjectsOfType<Volume>();
         foreach (var vol in volumes)
         {
@@ -117,10 +103,8 @@ public class CataractController : MonoBehaviour
         float brightness = roomDarkness.GetSceneBrightness();
         float dt = Time.deltaTime * transitionSpeed;
 
-        // --- Calculate target values ---
-
-        // Blur: U-shaped curve. Best at ~0.5 brightness (indoor lights).
-        // Worse in bright light (whole lens flooded) AND in dark (dilated pupil).
+      
+        // blur from deviation
         float optBright = 0.5f;
         float deviation = Mathf.Abs(brightness - optBright) / Mathf.Max(optBright, 0.01f);
         float targetBlur = baseBlur;
@@ -129,19 +113,16 @@ public class CataractController : MonoBehaviour
         else
             targetBlur += darkBlurBoost * Mathf.Pow(deviation, 2f);
 
-        // Scatter: steep exponential with brightness.
-        // Negligible below ~0.3, ramps up sharply toward 1.0.
+      
+        // light scatter curve
         float scatterCurve = Mathf.Pow(Mathf.Max(brightness - 0.3f, 0f) / 0.7f, 2.5f);
         float targetScatter = maxScatter * scatterCurve;
 
-        // Contrast loss: base + brightness-driven component
         float targetContrast = baseContrastLoss
             + (maxContrastLoss - baseContrastLoss) * Mathf.Pow(brightness, 1.5f);
 
-        // Veiling glare: proportional to brightness
         float targetVeil = maxVeilingGlare * Mathf.Pow(brightness, 1.5f);
 
-        // Bloom intensity & threshold
         float targetBloomInt, targetBloomThresh;
         if (brightness > 0.7f)
         {
@@ -161,7 +142,6 @@ public class CataractController : MonoBehaviour
             targetBloomThresh = indoorBloomThreshold;
         }
 
-        // --- Smooth transitions ---
         curBlur = Mathf.Lerp(curBlur, targetBlur, dt);
         curScatter = Mathf.Lerp(curScatter, targetScatter, dt);
         curContrast = Mathf.Lerp(curContrast, targetContrast, dt);
@@ -169,14 +149,13 @@ public class CataractController : MonoBehaviour
         curBloomInt = Mathf.Lerp(curBloomInt, targetBloomInt, dt);
         curBloomThresh = Mathf.Lerp(curBloomThresh, targetBloomThresh, dt);
 
-        // --- Apply to shader ---
+        // push to shader
         cataractMaterial.SetFloat("_BlurRadius", curBlur);
         cataractMaterial.SetFloat("_ScatterStrength", curScatter);
         cataractMaterial.SetFloat("_ContrastLoss", curContrast);
         cataractMaterial.SetFloat("_YellowTint", yellowTint);
         cataractMaterial.SetFloat("_VeilingGlare", curVeil);
 
-        // --- Apply Bloom ---
         if (bloom != null)
         {
             bloom.intensity.Override(curBloomInt);
@@ -185,13 +164,12 @@ public class CataractController : MonoBehaviour
 
     }
 
+    // cleanup on exit
     void OnDisable()
     {
-        // Stop the renderer feature from blitting outside the classroom
         if (cataractFeature != null)
             cataractFeature.SetActive(false);
 
-        // Reset shader params so they don't linger if re-enabled unexpectedly
         if (cataractMaterial != null)
         {
             cataractMaterial.SetFloat("_BlurRadius", 0f);
@@ -201,7 +179,6 @@ public class CataractController : MonoBehaviour
             cataractMaterial.SetFloat("_VeilingGlare", 0f);
         }
 
-        // Restore original Bloom values so edits don't persist on shared profile
         if (bloom != null && hadBloom)
         {
             bloom.intensity.Override(originalBloomIntensity);

@@ -14,6 +14,7 @@ public class CataractRenderPass : ScriptableRenderPass
 
     public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
     {
+        // allocate temp RT
         var descriptor = renderingData.cameraData.cameraTargetDescriptor;
         descriptor.depthBufferBits = 0;
         RenderingUtils.ReAllocateIfNeeded(ref tempHandle, descriptor,
@@ -22,6 +23,7 @@ public class CataractRenderPass : ScriptableRenderPass
 
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
+        // skip non-game cameras
         if (material == null || tempHandle == null) return;
         if (renderingData.cameraData.isSceneViewCamera) return;
         if (renderingData.cameraData.isPreviewCamera) return;
@@ -32,6 +34,7 @@ public class CataractRenderPass : ScriptableRenderPass
 
         RTHandle cameraTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
 
+        // apply fullscreen effect
         Blit(cmd, cameraTarget, tempHandle, material, 0);
         Blit(cmd, tempHandle, cameraTarget);
 

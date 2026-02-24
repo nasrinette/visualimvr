@@ -25,7 +25,7 @@ public class ClassroomGuideCharacter : MonoBehaviour
 
     void Update()
     {
-        // Detect when audio stops to fire the finished callback
+        // detect audio end
         if (wasPlaying && !IsPlaying)
         {
             wasPlaying = false;
@@ -37,11 +37,13 @@ public class ClassroomGuideCharacter : MonoBehaviour
     {
         if (clip == null) return;
 
+        // trigger talk animation
         if (animator != null)
         {
             animator.SetTrigger("Interact");
         }
 
+        // play clip
         if (audioSource != null)
         {
             audioSource.clip = clip;

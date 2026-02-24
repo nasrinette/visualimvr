@@ -1,12 +1,6 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-/// <summary>
-/// Two-handed curtain interaction. Each curtain has a left and right piece with
-/// hooks at their inner edges. When both hooks are grabbed simultaneously,
-/// pulling hands apart opens the curtains, pushing them together closes them.
-/// Curtain pieces animate smoothly and compress (scale) when bunched up at rod ends.
-/// </summary>
 public class CurtainInteraction : MonoBehaviour
 {
     [Header("Curtain Panels")]
@@ -69,6 +63,7 @@ public class CurtainInteraction : MonoBehaviour
     private float rightTargetX;
     private bool initialized;
 
+    // register XR listeners
     void OnEnable()
     {
         if (leftHook != null)
@@ -82,7 +77,6 @@ public class CurtainInteraction : MonoBehaviour
             rightHook.selectExited.AddListener(OnRightHookReleased);
         }
 
-        // Reset curtains to fully open on every classroom entry
         if (initialized)
             ResetToOpen();
     }
@@ -164,11 +158,11 @@ public class CurtainInteraction : MonoBehaviour
             audioSource.Stop();
     }
 
+    // track hand movement
     void Update()
     {
         Vector3 localXWorld = transform.TransformDirection(Vector3.right);
 
-        // Update left curtain target from hand movement
         if (leftInteractor != null)
         {
             Vector3 leftCurrentWorld = GetInteractorPosition(leftInteractor);
@@ -176,7 +170,6 @@ public class CurtainInteraction : MonoBehaviour
             leftTargetX = Mathf.Clamp(leftCurtainGrabStartX + leftDelta, leftOpenX, leftClosedX);
         }
 
-        // Update right curtain target from hand movement
         if (rightInteractor != null)
         {
             Vector3 rightCurrentWorld = GetInteractorPosition(rightInteractor);
@@ -184,11 +177,11 @@ public class CurtainInteraction : MonoBehaviour
             rightTargetX = Mathf.Clamp(rightCurtainGrabStartX + rightDelta, rightClosedX, rightOpenX);
         }
 
-        // Smoothly animate toward targets
         AnimateCurtains();
         UpdateHookPositions();
     }
 
+    // lerp toward targets
     void AnimateCurtains()
     {
         float dt = Time.deltaTime * animationSpeed;
@@ -236,6 +229,7 @@ public class CurtainInteraction : MonoBehaviour
         }
     }
 
+    // sync hooks to panels
     void UpdateHookPositions()
     {
         if (leftHook != null && leftCurtain != null)
@@ -270,10 +264,6 @@ public class CurtainInteraction : MonoBehaviour
         rightTargetX = rightX;
     }
 
-    /// <summary>
-    /// Performs one animation step with the given delta time. Returns true when done.
-    /// Used by the custom editor to animate in edit mode.
-    /// </summary>
     public bool AnimateStep(float dt)
     {
         float smoothDt = dt * animationSpeed;
@@ -311,9 +301,6 @@ public class CurtainInteraction : MonoBehaviour
         return done;
     }
 
-    /// <summary>
-    /// Returns 0 = fully open, 1 = fully closed.
-    /// </summary>
     public float GetClosedAmount()
     {
         float leftT = 0f, rightT = 0f;
@@ -329,7 +316,6 @@ public class CurtainInteraction : MonoBehaviour
         leftTargetX = leftOpenX;
         rightTargetX = rightOpenX;
 
-        // Snap curtain positions immediately (no animation)
         if (leftCurtain != null)
         {
             Vector3 pos = leftCurtain.localPosition;

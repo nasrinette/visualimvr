@@ -46,9 +46,9 @@ public class ClassroomDialogueManager : MonoBehaviour
     private FlowState state = FlowState.WaitingToStart;
     private Queue<AudioClip> dialogueQueue = new Queue<AudioClip>();
 
+    // reset on entry
     void OnEnable()
     {
-        // Reset state machine so the flow restarts on every classroom entry
         state = FlowState.WaitingToStart;
         dialogueQueue.Clear();
         Invoke(nameof(StartWelcome), welcomeDelay);
@@ -112,6 +112,7 @@ public class ClassroomDialogueManager : MonoBehaviour
         QueueDialogue(welcomeClip);
     }
 
+    // advance state machine
     private void OnDialogueFinished()
     {
         switch (state)
@@ -131,6 +132,7 @@ public class ClassroomDialogueManager : MonoBehaviour
         }
     }
 
+    // curtain phase check
     private void CheckCurtainsClosed()
     {
         int closedCount = GetClosedCurtainCount();
@@ -158,6 +160,7 @@ public class ClassroomDialogueManager : MonoBehaviour
         }
     }
 
+    // proximity check
     private void CheckApproachBoard()
     {
         if (playerHead == null || whiteboardTransform == null)

@@ -43,12 +43,12 @@ public class LightSwitch : MonoBehaviour
         audioSource.spatialBlend = 1f;
     }
 
+    // reset on entry
     void OnEnable()
     {
         if (interactable != null)
             interactable.selectEntered.AddListener(OnSwitchPressed);
 
-        // Reset to OFF every time the classroom activates
         if (initialized)
         {
             lightsOn = false;
@@ -78,6 +78,7 @@ public class LightSwitch : MonoBehaviour
         Toggle();
     }
 
+    // flip state
     public void Toggle()
     {
         lightsOn = !lightsOn;
@@ -87,6 +88,7 @@ public class LightSwitch : MonoBehaviour
         Debug.Log($"Light switch toggled: lights are now {(lightsOn ? "ON" : "OFF")}");
     }
 
+    // update visuals
     void ApplyLightState()
     {
         foreach (var light in lights)
