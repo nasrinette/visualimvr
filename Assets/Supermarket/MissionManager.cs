@@ -123,21 +123,11 @@ public class MissionManager : MonoBehaviour
         Debug.Log($"Received: {item.itemType}");
         Debug.Log($"Mission Active: {hasMissionActive}");
 
-        if (!hasMissionActive)
-        {
-            Debug.LogWarning("❌ No mission active! Player brought item without mission.");
-            if (guideCharacter != null && noMissionDialogue != null)
-                guideCharacter.PlayDialogue(noMissionDialogue);
-            if (uiManager != null)
-                uiManager.ShowErrorState("No mission active!");
-            return;
-        }
 
         if (item.itemType != currentObjective)
         {
             Debug.LogWarning($"❌ WRONG ITEM! Expected {currentObjective} but got {item.itemType}");
-            if (guideCharacter != null && wrongItemDialogue != null)
-                guideCharacter.PlayDialogue(wrongItemDialogue);
+
             if (uiManager != null)
                 uiManager.ShowErrorState("Wrong item! Try again.");
             return;

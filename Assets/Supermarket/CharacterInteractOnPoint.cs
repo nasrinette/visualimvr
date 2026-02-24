@@ -20,6 +20,7 @@ public class CharacterInteractOnPoint : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
 
+        // ensure there is an AudioSource on this object
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -36,7 +37,7 @@ public class CharacterInteractOnPoint : MonoBehaviour
             audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         }
 
-        missionManager = FindObjectOfType<MissionManager>();
+        missionManager = FindObjectOfType<MissionManager>(); // locate mission manager in scene for item delivery tracking
     }
 
     void OnEnable()
@@ -51,10 +52,12 @@ public class CharacterInteractOnPoint : MonoBehaviour
 
     private void OnAButtonPressed(InputAction.CallbackContext context)
     {
+        // when the A button is pressed, check if our ray interactor is pointing at this guide
         if (rayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
         {
             if (hit.collider.gameObject == gameObject)
             {
+                // trigger the talking animation and play dialogue sound
                 animator.SetTrigger("Interact");
                 PlayNextDialogue();
             }
@@ -75,14 +78,13 @@ public class CharacterInteractOnPoint : MonoBehaviour
     private void ReceiveItem(SupermarketItem item)
     {
         Debug.Log($"Guide received: {item.itemType}");
-        animator.SetTrigger("Interact");
+        animator.SetTrigger("Interact"); // play interaction animation when item is accepted
 
         if (missionManager != null)
-            missionManager.OnItemDelivered(item);
+            missionManager.OnItemDelivered(item); // inform mission manager that item was delivered
 
-        Destroy(item.gameObject);
+        Destroy(item.gameObject); // remove the item from the world once received
 
-        // Reset after a short delay in case another item is delivered shortly after
         Invoke(nameof(ResetReceiving), 1f);
     }
 

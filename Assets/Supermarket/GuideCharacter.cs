@@ -30,6 +30,7 @@ public class GuideCharacter : MonoBehaviour
 
     public void PlayDialogue(AudioClip clip)
     {
+        // Trigger talking animation and play the provided dialogue clip
         if (animator != null)
             animator.SetTrigger("Interact");
 

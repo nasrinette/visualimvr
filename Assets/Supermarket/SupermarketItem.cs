@@ -13,10 +13,6 @@ public class SupermarketItem : MonoBehaviour
     [Header("Item Info")]
     public ItemType itemType;
     
-    [Header("Visual")]
-    public Color actualColor; // The "real" color (for debugging/reference)
-    
-
     
     void Start()
     {

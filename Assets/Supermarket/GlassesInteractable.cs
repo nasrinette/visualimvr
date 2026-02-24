@@ -53,7 +53,6 @@ public class GlassesInteractable : MonoBehaviour
         if (grabInteractable != null)
         {
             grabInteractable.selectEntered.AddListener(OnGlassesGrabbed);
-            grabInteractable.hoverEntered.AddListener(OnGlassesHovered);
         }
     }
 
@@ -62,7 +61,6 @@ public class GlassesInteractable : MonoBehaviour
         if (grabInteractable != null)
         {
             grabInteractable.selectEntered.RemoveListener(OnGlassesGrabbed);
-            grabInteractable.hoverEntered.RemoveListener(OnGlassesHovered);
         }
     }
 
@@ -76,22 +74,6 @@ public class GlassesInteractable : MonoBehaviour
         }
     }
 
-    void OnGlassesHovered(HoverEnterEventArgs args)
-    {
-        // Show warning when hovering over glasses while wearing another pair
-        if (isWearingGlasses && !hasShownWarning)
-        {
-            Debug.Log($"Cannot pick up {colorblindType} glasses - already wearing {currentGlassesType} glasses!");
-            
-            if (guideCharacter != null && alreadyWearingGlassesClip != null)
-            {
-                guideCharacter.PlayDialogue(alreadyWearingGlassesClip);
-            }
-            
-            hasShownWarning = true;
-            Invoke(nameof(ResetWarning), 3f); // Reset after 3 seconds
-        }
-    }
 
     void ResetWarning()
     {
@@ -112,6 +94,7 @@ public class GlassesInteractable : MonoBehaviour
 
         if (Colorblindness.Instance != null)
         {
+            //Activate the colorblind filter in the scene based on the type of glasses picked up
             Colorblindness.Instance.Change((int)colorblindType);
             Debug.Log($"Applied {colorblindType} filter from {gameObject.name}");
         }
