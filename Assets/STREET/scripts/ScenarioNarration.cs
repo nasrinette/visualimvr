@@ -104,7 +104,7 @@ public class ScenarioNarration : MonoBehaviour
 
     public void OnCrosswalkButtonPressed()
     {
-        if (CurrentPhase != Phase.WaitForGreen) return;
+        if (CurrentPhase != Phase.WaitForGreen) return; 
         CurrentPhase = Phase.CrossStreet;
         pedestrianEvents.StartWaitForGreenMoment();
     }

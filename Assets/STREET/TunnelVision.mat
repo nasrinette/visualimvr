@@ -36,8 +36,8 @@ Material:
     - _EdgeWidth2: 0.02
     - _Feather: 0.24
     - _GlowWidth: 0.013
-    - _Radius: 0.18
-    - _ShowArrows: 0
+    - _Radius: 0.04000003
+    - _ShowArrows: 1
     - _Snap: 0
     - _Strain: 0
     - _WarpStrength: 0.0002

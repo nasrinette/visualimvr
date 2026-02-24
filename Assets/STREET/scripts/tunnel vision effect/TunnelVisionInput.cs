@@ -15,7 +15,6 @@ public class TunnelVisionInput : MonoBehaviour
     [Header("Material to drive")]
     public Material tunnelMaterial;
 
-    // TODO modify this when testing with headset & controllers
     [Header("Gesture")]
     public float gripThreshold = 0.4f;
     public float minDist = 0.20f;
@@ -114,13 +113,13 @@ public class TunnelVisionInput : MonoBehaviour
         var rightAction = GetRightGripAction();
 
         bool leftHeld = leftAction != null && leftAction.IsPressed();
-        if (leftHeld) Debug.Log("pressed on left");
+        // if (leftHeld) Debug.Log("pressed on left");
 
         bool rightHeld = rightAction != null && rightAction.IsPressed();
-        if (rightHeld) Debug.Log("pressed on right");
+        // if (rightHeld) Debug.Log("pressed on right");
 
         bool gripsHeld = leftHeld && rightHeld;
-        if (gripsHeld) Debug.Log("pressed on both");
+        // if (gripsHeld) Debug.Log("pressed on both");
 
 
         float currentDist = Vector3.Distance(leftController.position, rightController.position);

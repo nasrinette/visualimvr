@@ -20,16 +20,17 @@ public class CarStopLine : MonoBehaviour
 
     Dictionary<CinemachineDollyCart, float> saved = new Dictionary<CinemachineDollyCart, float>(); // stores the current speed for each value
 
+    public float fallbackSpeed = 10f;
+
     void OnTriggerEnter(Collider other)
     {
         var cart = other.GetComponentInParent<CinemachineDollyCart>();
         if (cart == null) return;
 
-        if (isFrontStopLine)
-        {
-            currentCar = cart;
-        }
-            
+        // if (isFrontStopLine)
+        // {
+        currentCar = cart;
+        // }
 
     }
     void OnTriggerStay(Collider other)
@@ -45,6 +46,7 @@ public class CarStopLine : MonoBehaviour
 
         if (isFrontStopLine || (lineAhead != null && lineAhead.CurrentCar != null)) // if either we are in the 1st line or the lines ahead are already occupied by other cars
         {
+
             Hold(cart); // we stop the car here 
 
         }
@@ -69,14 +71,22 @@ public class CarStopLine : MonoBehaviour
 
     public void Hold(CinemachineDollyCart car)
     {
+        // if (car == null) return;
+        // if (!saved.ContainsKey(car)) saved[car] = car.m_Speed; // we keep the car speed
+        // car.m_Speed = 0f; // stop car
         if (car == null) return;
-        if (!saved.ContainsKey(car)) saved[car] = car.m_Speed; // we keep the car speed
-        car.m_Speed = 0f; // stop car
+
+        if (!saved.ContainsKey(car))
+        {
+            saved[car] = (car.m_Speed > 0.01f) ? car.m_Speed : fallbackSpeed;
+        }
+        car.m_Speed = 0f;
     }
 
     public void Release(CinemachineDollyCart car)
     {
         if (car == null) return;
+
         if (saved.TryGetValue(car, out var speed))
         {
             car.m_Speed = speed; // we retrieve the corresponding car speed

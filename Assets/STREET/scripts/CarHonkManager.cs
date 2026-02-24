@@ -24,20 +24,29 @@ public class CarHonkManager : MonoBehaviour
     {
         // if (busy) return false; // todo fix that??
         // we retrieve if a car is inside the stop lines
+        CarStopLine line = null;
+        var car = stopLine1?.CurrentCar;
+        if (car != null) line = stopLine1;
+        else
+        {
+            car = stopLine2?.CurrentCar;
+            if (car != null) line = stopLine2;
+        }
 
-        var car = stopLine1?.CurrentCar ?? stopLine2?.CurrentCar;
-        if (car == null) return false;
-
-        StartCoroutine(Honk(car));
+        // var car = stopLine1?.CurrentCar ?? stopLine2?.CurrentCar;
+        // if (car == null) return false;
+ if (car == null || line == null) return false;
+ 
+        StartCoroutine(Honk(line, car));
         return true;
     }
 
-    IEnumerator Honk(CinemachineDollyCart car)
+    IEnumerator Honk(CarStopLine line,CinemachineDollyCart car)
     {
         busy = true;
 
-        car.m_Speed = 0f;
-
+        // car.m_Speed = 0f;
+        line.Hold(car);
         var audio = car.GetComponentInChildren<AudioSource>();
         if (audio != null && hornSound != null)
         {
